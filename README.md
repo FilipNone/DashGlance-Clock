@@ -20,27 +20,30 @@
   <a href="#license">License</a>
 </p>
 
+> [!NOTE]
+> DashGlance Clock is a proof of concept. Android Auto has no proper place for a clock yet, so this app borrows the music card and the navigation screen. Expect rough edges until Android Auto opens up features like dashboard widgets.
+
 ## Showcase
 
 <p align="center">
-  <img src="docs/images/analog-night.png" alt="Analog face in night mode" width="49%">
-  <img src="docs/images/digital-night.png" alt="Digital face in night mode, 24-hour time" width="49%">
+  <img src="docs/images/card-next-to-map.png" alt="The DashGlance card with the time, date and current song next to Google Maps">
 </p>
 <p align="center">
-  <img src="docs/images/analog-day.png" alt="Analog face in day mode" width="49%">
-  <img src="docs/images/digital-day.png" alt="Digital face in day mode, 12-hour time" width="49%">
+  <img src="docs/images/analog.png" alt="Full-screen analog face" width="49%">
+  <img src="docs/images/digital.png" alt="Full-screen digital face" width="49%">
 </p>
 
-The car screen at night (top) and during the day (bottom), drawn by the app's renderer at 1280 × 720.
+Screenshots from Google's Desktop Head Unit. Top: the card next to Google Maps. Bottom: the full-screen faces.
 
 ## Features
 
-- Analog and digital faces that fill the car screen
-- Seconds and the date, updated every second
-- Colors that switch with the car's day and night mode
-- One button to switch faces; the phone app keeps the same choice
+- The time and date in the music card next to the map, with the song playing on your phone
+- Play/pause, next and previous for whichever music app is playing
+- Full-screen analog and digital faces with seconds
 - 12- or 24-hour time from your phone settings, and the date in your language
-- No internet permission, ads or tracking
+- No internet access, ads or tracking
+
+Android Auto shows one DashGlance icon for both the card and the full-screen clock, and picks which one opens.
 
 ## Installation
 
@@ -52,7 +55,8 @@ The car screen at night (top) and during the day (bottom), drawn by the app's re
 1. Download the APK from the [latest release](https://github.com/FilipNone/DashGlance-Clock/releases/latest) and install it on your phone. It needs Android 8.0 or newer.
 2. Android Auto hides apps that don't come from Google Play, so turn on its developer settings: open Android Auto's settings, tap Version 10 times, and confirm.
 3. In the ⋮ menu, open Developer settings and turn on Unknown sources.
-4. Connect to your car. DashGlance Clock is in the Android Auto app list.
+4. Open DashGlance on your phone and tap Allow music controls. The app uses this access to see and control your music app, and ignores your notifications.
+5. Connect to your car. DashGlance Clock is in the Android Auto app list.
 
 While no car is connected, Android Auto's "Customize launcher" screen on the phone won't list the app. That's expected.
 

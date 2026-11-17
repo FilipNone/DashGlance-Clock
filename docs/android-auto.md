@@ -32,13 +32,26 @@ adb shell cmd notification allow_listener 'com.google.android.projection.gearhea
 | `Out of sync with phone. Exiting...` | phone still in accessory mode from an earlier run | `scripts/dhu.sh --usb` resets the phone's USB first; otherwise replug the cable |
 | `day` command does nothing | probably Android Auto's day/night setting, which was set to Night on the test phone | try setting it to Automatic in Android Auto's settings (not tested) |
 
-With stdin piped in, these DHU console commands help with testing: `tap X Y`, `screenshot FILE`, `day`, `night`. Coordinates match the 800 x 480 screenshot.
+With stdin piped in, these DHU console commands help with testing: `tap X Y`, `screenshot FILE`, `day`, `night`. Coordinates match the screenshot size (800 x 480 by default, 1280 x 720 with `-c config/default_720p.ini`).
+
+For screenshots with a map, set a mock location first so your own doesn't show up:
+
+```sh
+adb shell appops set com.android.shell android:mock_location allow
+for p in gps network fused; do
+  adb shell cmd location providers add-test-provider $p
+  adb shell cmd location providers set-test-provider-enabled $p true
+  adb shell cmd location providers set-test-provider-location $p --location 45.0337,7.6664
+done
+# afterwards: remove-test-provider for each, then appops ... android:mock_location default
+```
 
 ## Clock next to the map
 
 Tested on Android Auto 18.0 with Waze and Metrolist. The only slot beside another app's map is the media card, so `media/ClockMediaService` is a Media3 media app that plays nothing. Its card shows the time as artwork, the date as title and the phone's current song as subtitle. Play/pause and skip go to whichever music app is active, through notification access.
 
-- One tile per app: with both a media service and a `CarAppService`, the Android Auto launcher and dock open the media screen. The full-screen clock can't be reached while the media service exists.
+- One tile per app: with both a media service and a `CarAppService`, the launcher shows one DashGlance tile. It opened the media screen in some tests and the full-screen clock in others; the rule behind it is unknown.
+- At 1280 x 720 the card is tall and narrow and crops the square artwork to its middle 52%, so the digits stay inside that band.
 - Android Auto draws the card. Apps only supply artwork, title, subtitle and buttons. Card artwork is dimmed to about 38% (white digits measure 97/255); the full media screen shows it undimmed.
 - With two sessions playing, `GH.MediaNowPlayingApp` logs "Multiple playing browser services" and picks the one whose playback state changed last. DashGlance updates right after the music app, so it usually wins, but the music app's card can appear in between.
 - `SuggestionManager` (navigation apps, Car API 5) works: a suggestion with the time as title shows as a card in the dashboard's right column. Android Auto only shows it while DashGlance is the active navigation app, though. Once Waze takes over, Android Auto keeps DashGlance bound and logs `SuggestionHost: Received Suggestions from 3p App` every minute, but hides the card.

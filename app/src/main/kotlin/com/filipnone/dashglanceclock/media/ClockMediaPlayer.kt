@@ -144,10 +144,11 @@ class ClockMediaPlayer(
         const val ARTWORK_SIZE = 320
         const val REFERENCE_TEXT_SIZE = 100f
 
-        // Fractions of the artwork. Keeps the digits clear of the card's text and of the
-        // sides Android Auto crops off on narrow cards.
+        // Fractions of the artwork. The card crops the square to its own shape, and on a
+        // 1280 x 720 screen only the middle 52% of the width stays visible. The card's text
+        // covers the bottom 45%.
         const val DIGITS_CENTER_Y = 0.3f
-        const val DIGITS_MAX_WIDTH = 0.7f
+        const val DIGITS_MAX_WIDTH = 0.46f
         const val DIGITS_MAX_HEIGHT = 0.26f
     }
 }
