@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Themed icon layer. The launcher tints it with one color and keeps only the alpha, so the
+     dial is left out and the triangle is drawn as an outline around the solid arrow. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:pathData="@string/icon_major_ticks"
+        android:strokeWidth="2.6"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="@string/icon_minor_ticks"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="@string/icon_triangle"
+        android:strokeWidth="3.4"
+        android:strokeColor="#FF000000"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="@string/icon_arrow"
+        android:strokeWidth="2.3"
+        android:strokeColor="#FF000000"
+        android:strokeLineJoin="round" />
+</vector>

@@ -1,0 +1,28 @@
+[versions]
+androidGradlePlugin = "9.5.1"
+kotlin = "2.4.21"
+androidxActivity = "1.13.0"
+androidxAnnotation = "1.11.0"
+androidxCarApp = "1.8.0-rc01"
+androidxCore = "1.19.1"
+androidxLifecycle = "2.11.0"
+androidxMedia3 = "1.11.1"
+androidxTestCore = "1.7.0"
+junit = "4.13.2"
+robolectric = "4.18"
+
+[libraries]
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivity" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxAnnotation" }
+androidx-car-app = { module = "androidx.car.app:app", version.ref = "androidxCarApp" }
+androidx-car-app-testing = { module = "androidx.car.app:app-testing", version.ref = "androidxCarApp" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "androidxLifecycle" }
+androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "androidxMedia3" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
+junit = { module = "junit:junit", version.ref = "junit" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
