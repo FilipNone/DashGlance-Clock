@@ -15,6 +15,8 @@ class ClockScreen(
     private val preferences: ClockPreferences,
 ) : Screen(carContext) {
 
+    // Designs are picked on the phone. The car only gets the analog/digital switch, so there's
+    // as little as possible to touch while driving.
     override fun onGetTemplate(): Template {
         val nextFace = preferences.face.toggled()
         val switchFace = Action.Builder()

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ease out: the thumb starts fast and slows down as it reaches the other end. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/switch_off">
+    <target android:name="thumb">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="250"
+                android:interpolator="@android:interpolator/decelerate_cubic"
+                android:propertyName="translateX"
+                android:valueFrom="0"
+                android:valueTo="22"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="track">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="250"
+                android:interpolator="@android:interpolator/decelerate_cubic"
+                android:propertyName="fillColor"
+                android:valueFrom="@color/accent_pale"
+                android:valueTo="@color/accent"
+                android:valueType="colorType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

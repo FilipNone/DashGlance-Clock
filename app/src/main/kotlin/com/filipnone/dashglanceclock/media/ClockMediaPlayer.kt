@@ -108,7 +108,7 @@ class ClockMediaPlayer(
         DateTimeFormatter.ofPattern(if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm")
 
     private fun subtitle(playing: NowPlaying?): String = when {
-        !music.hasAccess -> context.getString(R.string.media_needs_access)
+        !music.isAllowed -> context.getString(R.string.media_needs_access)
         playing == null -> ""
         else -> listOfNotNull(playing.title, playing.artist).joinToString(" · ")
     }

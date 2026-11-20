@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- switch_turn_on.xml backwards, with the same ease out. A reversible transition would play
+     that one in reverse, which turns ease out into ease in. -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/switch_on">
+    <target android:name="thumb">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="250"
+                android:interpolator="@android:interpolator/decelerate_cubic"
+                android:propertyName="translateX"
+                android:valueFrom="22"
+                android:valueTo="0"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="track">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="250"
+                android:interpolator="@android:interpolator/decelerate_cubic"
+                android:propertyName="fillColor"
+                android:valueFrom="@color/accent"
+                android:valueTo="@color/accent_pale"
+                android:valueType="colorType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

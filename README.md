@@ -40,6 +40,7 @@ Screenshots from Google's Desktop Head Unit. Top: the card next to Google Maps. 
 - The time and date in the music card next to the map, with the song playing on your phone
 - Play/pause, next and previous for whichever music app is playing
 - Full-screen analog and digital faces with seconds
+- 40 designs to pick from on your phone: Modern clocks, Vintage clocks, Retro and Sci-Fi. ([docs/designs.md](docs/designs.md))
 - 12- or 24-hour time from your phone settings, and the date in your language
 - No internet access, ads or tracking
 
@@ -55,7 +56,7 @@ Android Auto shows one DashGlance icon for both the card and the full-screen clo
 1. Download the APK from the [latest release](https://github.com/FilipNone/DashGlance-Clock/releases/latest) and install it on your phone. It needs Android 8.0 or newer.
 2. Android Auto hides apps that don't come from Google Play, so turn on its developer settings: open Android Auto's settings, tap Version 10 times, and confirm.
 3. In the ⋮ menu, open Developer settings and turn on Unknown sources.
-4. Open DashGlance on your phone and tap Allow music controls. The app uses this access to see and control your music app, and ignores your notifications.
+4. Open DashGlance on your phone and turn on Allow music controls. The first time, Android asks you to give DashGlance notification access. The app uses it to see and control your music app, and ignores your notifications. Turning the switch off later stops DashGlance from using the access; to remove the access itself, turn it off in Android's notification access settings.
 5. Connect to your car. DashGlance Clock is in the Android Auto app list.
 
 While no car is connected, Android Auto's "Customize launcher" screen on the phone won't list the app. That's expected.
@@ -77,4 +78,4 @@ To see the car screen without a car, install the [Desktop Head Unit](https://dev
 
 [MIT](LICENSE). Made by [FilipNone](https://github.com/FilipNone).
 
-Android Auto is a trademark of Google LLC. This project isn't affiliated with or endorsed by Google.
+Android Auto is a trademark of Google LLC. This project isn't affiliated with or endorsed by Google. Phone, car, film and game names in the design list belong to their owners and only say what inspired a design. None of these companies is involved with this project.

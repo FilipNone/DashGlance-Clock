@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp"
+    android:height="30dp"
+    android:viewportWidth="52"
+    android:viewportHeight="30">
+    <path
+        android:name="track"
+        android:fillColor="@color/accent"
+        android:pathData="M15,0H37A15,15 0,0 1,37 30H15A15,15 0,0 1,15 0Z" />
+    <group
+        android:name="thumb"
+        android:translateX="22">
+        <path
+            android:fillColor="#26000000"
+            android:pathData="M4,16A11,11 0,1 1,26 16A11,11 0,1 1,4 16Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M4,15A11,11 0,1 1,26 15A11,11 0,1 1,4 15Z" />
+    </group>
+</vector>

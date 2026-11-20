@@ -8,12 +8,12 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Handler
 import android.os.Looper
-import androidx.core.app.NotificationManagerCompat
 
 data class NowPlaying(val title: String?, val artist: String?, val isPlaying: Boolean)
 
 interface MusicRemote {
-    val hasAccess: Boolean
+    // False until the user grants notification access, and while music controls are off in the app.
+    val isAllowed: Boolean
     val nowPlaying: NowPlaying?
     fun play()
     fun pause()
@@ -29,8 +29,14 @@ class PhoneMusic(
     private val sessionManager = context.getSystemService(MediaSessionManager::class.java)
     private val listenerComponent = ComponentName(context, MediaControlListener::class.java)
     private val handler = Handler(Looper.getMainLooper())
+    private val controls = MusicControls(context)
     private var controller: MediaController? = null
     private var listening = false
+
+    // The car card follows the in-app switch straight away instead of at the next minute.
+    init {
+        controls.observe(::refresh)
+    }
 
     private val sessionsChanged = MediaSessionManager.OnActiveSessionsChangedListener { select(it.orEmpty()) }
 
@@ -40,8 +46,8 @@ class PhoneMusic(
         override fun onSessionDestroyed() = select(activeSessions())
     }
 
-    override val hasAccess: Boolean
-        get() = context.packageName in NotificationManagerCompat.getEnabledListenerPackages(context)
+    override val isAllowed: Boolean
+        get() = controls.isOn
 
     override val nowPlaying: NowPlaying?
         get() = controller?.let { player ->
@@ -52,21 +58,36 @@ class PhoneMusic(
             )
         }
 
-    // Safe to call often. It starts listening once notification access is granted, and picks
-    // the player again in case another one started without the session list changing.
+    // Safe to call often. It starts listening once music controls are allowed and stops when
+    // they aren't, and picks the player again in case another one started without the session
+    // list changing.
     fun refresh() {
-        if (!listening && hasAccess) {
+        if (!isAllowed) {
+            if (listening || controller != null) {
+                stopListening()
+                onChange()
+            }
+            return
+        }
+        if (!listening) {
             try {
                 sessionManager.addOnActiveSessionsChangedListener(sessionsChanged, listenerComponent, handler)
                 listening = true
             } catch (_: SecurityException) {
                 return
             }
+            // The card stops asking for access even if nothing is playing yet.
+            onChange()
         }
-        if (listening) select(activeSessions())
+        select(activeSessions())
     }
 
     fun release() {
+        controls.stopObserving()
+        stopListening()
+    }
+
+    private fun stopListening() {
         if (listening) sessionManager.removeOnActiveSessionsChangedListener(sessionsChanged)
         listening = false
         controller?.unregisterCallback(controllerCallback)

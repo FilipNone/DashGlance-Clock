@@ -23,7 +23,7 @@ The car launcher takes its name and icon from `android:label` and `android:icon`
 | Ink | `#17171C` | icon dial |
 | Paper | `#F5F5F5` | icon ticks and arrow |
 
-Use only these three. The icon colors live in `res/values/colors.xml` as `brand_orange`, `brand_ink` and `brand_paper`. The clock's own colors are in `ClockPalette.kt`, and its dark accent matches the icon orange.
+Use only these three. The icon colors live in `res/values/colors.xml` as `brand_orange`, `brand_ink` and `brand_paper`. The DashGlance design's colors are in `ClockPalette.kt`, and its dark accent matches the icon orange. The other clock designs bring their own colors (see designs.md); this rule covers the icon, the app chrome and the DashGlance design.
 
 ## Icon
 

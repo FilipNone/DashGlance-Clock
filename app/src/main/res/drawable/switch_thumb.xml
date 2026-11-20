@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Invisible: switch_track.xml draws the thumb. The Switch still uses this one's size, and
+     makes itself two thumbs wide, so 26dp gives the 52dp track. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/transparent" />
+    <size
+        android:width="26dp"
+        android:height="30dp" />
+</shape>

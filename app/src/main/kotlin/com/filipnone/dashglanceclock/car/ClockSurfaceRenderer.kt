@@ -12,7 +12,6 @@ import androidx.car.app.SurfaceContainer
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.filipnone.dashglanceclock.clock.ClockPalette
 import com.filipnone.dashglanceclock.clock.ClockPreferences
 import com.filipnone.dashglanceclock.clock.ClockRenderer
 import com.filipnone.dashglanceclock.clock.SecondTicker
@@ -88,14 +87,16 @@ class ClockSurfaceRenderer(
             return
         }
         try {
-            clockRenderer.palette = ClockPalette.forDarkMode(carContext.isDarkMode)
+            val design = preferences.design
+            ticker.motion = design.motion
+            clockRenderer.palette = design.palette(carContext, carContext.isDarkMode)
             clockRenderer.drawBackground(canvas)
             updateClockBounds()
             clockRenderer.draw(
                 canvas = canvas,
                 bounds = clockBounds,
                 now = LocalDateTime.now(),
-                face = preferences.face,
+                design = design,
                 use24Hour = DateFormat.is24HourFormat(carContext),
             )
         } finally {

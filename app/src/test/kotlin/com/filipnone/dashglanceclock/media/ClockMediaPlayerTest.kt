@@ -61,8 +61,8 @@ class ClockMediaPlayerTest {
     }
 
     @Test
-    fun withoutNotificationAccess_theCardSaysSo() {
-        music.hasAccess = false
+    fun withMusicControlsOff_theCardSaysSo() {
+        music.isAllowed = false
         player.refresh()
         idle()
 
@@ -87,7 +87,7 @@ class ClockMediaPlayerTest {
     private fun idle() = shadowOf(Looper.getMainLooper()).idle()
 
     private class FakeMusic : MusicRemote {
-        override var hasAccess = true
+        override var isAllowed = true
         override var nowPlaying: NowPlaying? = NowPlaying("Inorganic Soul", "Yuzo Koshiro", isPlaying = false)
         val calls = mutableListOf<String>()
 

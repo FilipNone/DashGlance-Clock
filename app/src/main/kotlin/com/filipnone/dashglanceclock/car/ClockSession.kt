@@ -16,7 +16,7 @@ class ClockSession : Session() {
         val screen = ClockScreen(carContext, preferences)
         surfaceRenderer = renderer
 
-        preferences.observeFace(lifecycle) {
+        preferences.observe(lifecycle) {
             screen.invalidate()
             renderer.render()
         }

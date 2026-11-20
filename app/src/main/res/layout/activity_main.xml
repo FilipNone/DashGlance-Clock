@@ -1,47 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Portrait: the designs are in a bottom sheet under the clock. The landscape layout has no
+     sheet, so the sheet's header and handle exist only here; MainActivity checks for them. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.filipnone.dashglanceclock.ui.ClockView
-        android:id="@+id/clock"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:contentDescription="@string/clock_content_description"
-        android:padding="24dp" />
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/hint"
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.filipnone.dashglanceclock.ui.ClockView
+                android:id="@+id/clock"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/clock_content_description"
+                android:padding="20dp" />
+
+            <TextView
+                android:id="@+id/hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="12dp"
+                android:text="@string/phone_hint"
+                android:textSize="14sp" />
+
+            <!-- A framework Switch: SwitchCompat and MaterialSwitch need an AppCompat or
+                 MaterialComponents theme, and the app uses framework Material. MainActivity sets
+                 it in onResume from the music controls state, so it doesn't save its own. -->
+            <Switch
+                android:id="@+id/media_access"
+                style="@style/Widget.DashGlance.PillSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:minHeight="48dp"
+                android:saveEnabled="false"
+                android:switchPadding="16dp"
+                android:text="@string/media_access_toggle"
+                android:textSize="16sp"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/design_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="6dp"
+            android:orientation="vertical"
+            app:gestureInsetBottomIgnored="true"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+            <LinearLayout
+                android:id="@+id/design_sheet_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                tools:ignore="InconsistentLayout">
+
+                <View
+                    android:id="@+id/design_sheet_handle"
+                    android:layout_width="32dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    tools:ignore="InconsistentLayout" />
+
+                <TextView
+                    android:id="@+id/design_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="18dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <com.filipnone.dashglanceclock.ui.DesignPicker
+                android:id="@+id/designs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp" />
+
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <FrameLayout
+        android:id="@+id/footer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="24dp"
-        android:text="@string/phone_hint"
-        android:textSize="14sp" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/media_access"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:text="@string/media_access_button"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/credit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/credit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="8dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:minHeight="48dp"
-        android:paddingHorizontal="16dp"
-        android:textSize="14sp" />
+    </FrameLayout>
 
 </LinearLayout>

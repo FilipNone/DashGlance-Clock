@@ -9,6 +9,7 @@ androidxLifecycle = "2.11.0"
 androidxMedia3 = "1.11.1"
 androidxTestCore = "1.7.0"
 junit = "4.13.2"
+material = "1.14.0"
 robolectric = "4.18"
 
 [libraries]
@@ -21,6 +22,7 @@ androidx-lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", ve
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "androidxMedia3" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 junit = { module = "junit:junit", version.ref = "junit" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]

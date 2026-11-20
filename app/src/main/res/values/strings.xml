@@ -4,10 +4,20 @@
     <string name="creator_name" translatable="false">FilipNone</string>
     <string name="creator_url" translatable="false">https://github.com/FilipNone</string>
     <string name="credit">%1$s by %2$s</string>
+    <string name="credit_description">%1$s by %2$s, on GitHub</string>
     <string name="face_analog">Analog</string>
     <string name="face_digital">Digital</string>
     <string name="clock_content_description">Clock. Tap to switch between analog and digital.</string>
-    <string name="media_access_button">Allow music controls</string>
+    <string name="design_title_analog">Analog designs</string>
+    <string name="design_title_digital">Digital designs</string>
+    <string name="designs_show_all">Show all designs</string>
+    <string name="designs_show_fewer">Show fewer designs</string>
+    <string name="design_group_original">Original</string>
+    <string name="design_group_phones">Phone brands</string>
+    <string name="design_group_vintage_cars">Vintage cars</string>
+    <string name="design_group_modern_cars">Modern cars</string>
+    <string name="design_group_retro_scifi">Retro and sci-fi</string>
+    <string name="media_access_toggle">Allow music controls</string>
     <string name="media_needs_access">Allow music controls in the DashGlance app</string>
-    <string name="phone_hint">Tap the clock to switch between analog and digital. Connect your phone to Android Auto to see the clock in your car.</string>
+    <string name="phone_hint">Tap the clock to switch between analog and digital</string>
 </resources>

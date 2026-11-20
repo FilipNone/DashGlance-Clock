@@ -11,8 +11,8 @@ android {
         // java.time needs API 26. Going lower means turning on core library desugaring.
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0-beta"
+        versionCode = 2
+        versionName = "0.2.0-beta"
     }
 
     // The keystore and passwords live outside the repo, in ~/.gradle/gradle.properties.
@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.common)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.annotation)
+    implementation(libs.material)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
