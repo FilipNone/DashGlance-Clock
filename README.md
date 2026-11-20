@@ -35,6 +35,12 @@
 
 Screenshots from Google's Desktop Head Unit. Top: the card next to Google Maps. Bottom: the full-screen faces.
 
+<p align="center">
+  <img src="docs/images/designs.png" alt="The clock designs you can pick on the phone, in four groups: phone brands, vintage cars, modern cars, and retro and sci-fi">
+</p>
+
+The other designs you can pick on your phone, as the car draws them. [docs/designs.md](docs/designs.md) says what each one is based on.
+
 ## Features
 
 - The time and date in the music card next to the map, with the song playing on your phone
