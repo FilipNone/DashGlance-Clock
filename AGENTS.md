@@ -31,7 +31,8 @@ app/src/main/kotlin/com/filipnone/dashglanceclock/
     MusicControls.kt         in-app on/off on top of notification access; off unbinds the listener
   ui/ClockView.kt            phone view that wraps ClockRenderer
   ui/DesignPicker.kt         live design previews, one sideways row per group
-  ui/DesignSheet.kt          bottom sheet around the picker; pull up for all groups, clock shrinks
+  ui/DesignSheet.kt          bottom sheet around the picker; pull up for all groups, clock shrinks; hops 1s after opening or a face switch
+  ui/SheetHandle.kt          sheet's drag handle; the line bends into a ^ during the hop
 app/src/main/res/drawable/switch_*.xml   pill music-controls switch; ease-out animated-selector track, style in themes.xml
   MainActivity.kt            phone screen: clock, design sheet, GitHub credit footer
 app/src/main/res/layout-land/activity_main.xml   landscape: clock left, designs right, no sheet

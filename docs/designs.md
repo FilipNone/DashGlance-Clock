@@ -2,7 +2,7 @@
 
 Designs are picked on the phone only. The car keeps its single analog/digital button, and draws whichever design the phone saved for that face. Each face remembers its own design (`analog_design`, `digital_design` in the `clock` prefs file).
 
-In portrait the designs sit in a bottom sheet under the clock. Collapsed, it shows the first group; pulling it up or tapping its header shows the rest, and each group is a row you swipe sideways. In short windows such as split screen, the collapsed sheet shows only its header. In landscape (`layout-land`) the screen splits in half: the clock and credit on the left, the full design list on the right, opened at the selected design.
+In portrait the designs sit in a bottom sheet under the clock. Collapsed, it shows the first group; pulling it up or tapping its header shows the rest, and each group is a row you swipe sideways. In short windows such as split screen, the collapsed sheet shows only its header. A second after the app opens, and a second after a face switch, the collapsed sheet rises 48dp to peek at the next group while its handle bends from a line into a ^. It holds there for 50ms, then drops like a ball and bounces twice, to 16% and 4% of the lift; the ^ flattens as it lands. The whole hop takes about 1.25s. Dragging or tapping the sheet stops the hop. In landscape (`layout-land`) the screen splits in half: the clock and credit on the left, the full design list on the right, opened at the selected design.
 
 ## Catalog
 

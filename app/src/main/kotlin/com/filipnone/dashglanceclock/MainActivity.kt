@@ -27,6 +27,7 @@ import com.filipnone.dashglanceclock.media.MusicControls
 import com.filipnone.dashglanceclock.ui.ClockView
 import com.filipnone.dashglanceclock.ui.DesignPicker
 import com.filipnone.dashglanceclock.ui.DesignSheet
+import com.filipnone.dashglanceclock.ui.SheetHandle
 
 class MainActivity : ComponentActivity() {
 
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
         musicControls = MusicControls(this)
         // Only the portrait layout has the sheet's header and handle.
         val sheetHeader: View? = findViewById(R.id.design_sheet_header)
-        val sheetHandle: View? = findViewById(R.id.design_sheet_handle)
+        val sheetHandle: SheetHandle? = findViewById(R.id.design_sheet_handle)
 
         val isDarkMode = resources.configuration.uiMode and
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -72,17 +73,15 @@ class MainActivity : ComponentActivity() {
                 cornerRadius = corner
             }
         }
-        if (sheetHeader != null) {
-            sheetHandle?.background = GradientDrawable().apply {
-                setColor(ColorUtils.setAlphaComponent(palette.secondaryText, HANDLE_ALPHA))
-                cornerRadius = HANDLE_CORNER_DP * density
-            }
+        val designSheet = if (sheetHeader != null && sheetHandle != null) {
+            sheetHandle.color = ColorUtils.setAlphaComponent(palette.secondaryText, HANDLE_ALPHA)
             footer.setBackgroundColor(palette.dial)
-            DesignSheet(this, panel, sheetHeader, designs, content, clock)
+            DesignSheet(this, panel, sheetHeader, sheetHandle, designs, content, clock)
         } else {
             // The side panel's rows scroll under its rounded corners, so it clips them.
             panel.clipToOutline = true
             ViewCompat.setAccessibilityHeading(designTitle, true)
+            null
         }
 
         val appName = getString(R.string.app_name)
@@ -107,8 +106,13 @@ class MainActivity : ComponentActivity() {
         }
 
         val preferences = ClockPreferences(this)
+        // Switching faces, from the phone or the car, makes the sheet hop again. Picking a
+        // design and the first call here don't.
+        var shownFace: ClockFace? = null
         fun showChosenDesign() {
             val face = preferences.face
+            if (shownFace != null && face != shownFace) designSheet?.hint()
+            shownFace = face
             clock.design = preferences.designFor(face)
             designTitle.setText(
                 when (face) {
@@ -174,7 +178,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val PANEL_CORNER_DP = 24f
-        const val HANDLE_CORNER_DP = 2f
         const val HANDLE_ALPHA = 0x99
     }
 }

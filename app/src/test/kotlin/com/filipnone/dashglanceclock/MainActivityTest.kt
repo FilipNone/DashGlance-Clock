@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton
@@ -15,6 +16,7 @@ import com.filipnone.dashglanceclock.clock.ClockPreferences
 import com.filipnone.dashglanceclock.media.MediaControlListener
 import com.filipnone.dashglanceclock.media.MusicControls
 import com.filipnone.dashglanceclock.ui.ClockView
+import com.filipnone.dashglanceclock.ui.SheetHandle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -27,6 +29,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowChoreographer
 import java.time.Duration
 
 @RunWith(RobolectricTestRunner::class)
@@ -49,6 +52,7 @@ class MainActivityTest {
     private val coordinator = activity.findViewById<View>(R.id.coordinator)
     private val sheet = activity.findViewById<View>(R.id.design_panel)
     private val sheetHeader = activity.findViewById<View>(R.id.design_sheet_header)
+    private val sheetHandle = activity.findViewById<SheetHandle>(R.id.design_sheet_handle)
     private val behavior = BottomSheetBehavior.from(sheet)
     private val musicControls = activity.findViewById<CompoundButton>(R.id.media_access)
     private val preferences = ClockPreferences(activity)
@@ -215,6 +219,110 @@ class MainActivityTest {
     }
 
     @Test
+    fun aSecondAfterOpening_theSheetHopsToPeekAtMoreDesigns_withAChevronForAHandle() {
+        runFramesOnTheClock()
+        idleFor(900)
+        assertEquals(0f, sheet.translationY)
+        assertEquals(0f, sheetHandle.chevron)
+
+        idleFor(100 + HOP_TOP_MS)
+        assertTrue(sheet.translationY < 0f)
+        assertTrue(sheetHandle.chevron > 0.5f)
+        assertTrue(top(text("Phone brands")) < bottom(coordinator))
+
+        idleFor(HOP_END_MS)
+        assertEquals(0f, sheet.translationY)
+        assertEquals(0f, sheetHandle.chevron)
+        assertEquals(BottomSheetBehavior.STATE_COLLAPSED, behavior.state)
+    }
+
+    @Test
+    fun atTheTopOfTheHop_theSheetHoldsStill_asAFullChevron() {
+        val samples = sampleTheFirstHop()
+
+        val highest = samples.minOf { it.y }
+        val atTheTop = samples.filter { it.y == highest }
+        assertTrue(highest < 0f)
+        assertTrue(atTheTop.last().time - atTheTop.first().time >= 30)
+        assertTrue(atTheTop.all { it.chevron == 1f })
+    }
+
+    @Test
+    fun afterTheHold_theSheetDropsAndBouncesLower_withAFlatHandle() {
+        val samples = sampleTheFirstHop()
+
+        val highest = samples.minOf { it.y }
+        val afterTheTop = samples.drop(samples.indexOfLast { it.y == highest })
+        val bounce = afterTheTop.drop((1 until afterTheTop.size).first { afterTheTop[it].y < afterTheTop[it - 1].y })
+        assertTrue(bounce.minOf { it.y } < 0f)
+        assertTrue(bounce.minOf { it.y } > highest / 4)
+        assertTrue(bounce.all { it.chevron == 0f })
+        assertEquals(0f, samples.last().y)
+    }
+
+    @Test
+    fun aSecondAfterSwitchingTheClock_theSheetHopsAgain() {
+        runFramesOnTheClock()
+        idleFor(HINT_OVER_MS)
+
+        clock.performClick()
+        idleFor(900)
+        assertEquals(0f, sheet.translationY)
+
+        idleFor(100 + HOP_TOP_MS)
+        assertTrue(sheet.translationY < 0f)
+        assertTrue(sheetHandle.chevron > 0.5f)
+    }
+
+    @Test
+    fun pickingADesign_doesNotMakeTheSheetHop() {
+        runFramesOnTheClock()
+        idleFor(HINT_OVER_MS)
+
+        tile("Nothing OS")!!.performClick()
+        idleFor(1000 + HOP_TOP_MS)
+
+        assertEquals(0f, sheet.translationY)
+    }
+
+    @Test
+    fun anOpenSheet_doesNotHop() {
+        runFramesOnTheClock()
+        sheetHeader.performClick()
+        idleFor(1000 + HOP_TOP_MS)
+
+        assertEquals(BottomSheetBehavior.STATE_EXPANDED, behavior.state)
+        assertEquals(0f, sheet.translationY)
+        assertEquals(0f, sheetHandle.chevron)
+    }
+
+    @Test
+    fun openingTheSheetMidHop_stopsTheHop() {
+        runFramesOnTheClock()
+        idleFor(1000 + HOP_TOP_MS)
+        assertTrue(sheet.translationY < 0f)
+
+        sheetHeader.performClick()
+
+        assertEquals(0f, sheet.translationY)
+        assertEquals(0f, sheetHandle.chevron)
+        settle()
+        assertEquals(BottomSheetBehavior.STATE_EXPANDED, behavior.state)
+    }
+
+    @Test
+    fun leavingTheApp_cancelsThePendingHop_andComingBackHopsAgain() {
+        runFramesOnTheClock()
+        controller.pause().stop()
+        idleFor(1000 + HOP_TOP_MS)
+        assertEquals(0f, sheet.translationY)
+
+        controller.start().resume()
+        idleFor(1000 + HOP_TOP_MS)
+        assertTrue(sheet.translationY < 0f)
+    }
+
+    @Test
     fun tappingADesign_savesItAndShowsIt() {
         tile("Nothing OS")!!.performClick()
         idle()
@@ -241,6 +349,12 @@ class MainActivityTest {
         return matches.singleOrNull { it.contentDescription == label }
     }
 
+    private fun text(text: String): View {
+        val matches = ArrayList<View>()
+        activity.window.decorView.findViewsWithText(matches, text, View.FIND_VIEWS_WITH_TEXT)
+        return matches.single()
+    }
+
     private fun grantNotificationAccess() {
         val listener = ComponentName(activity, MediaControlListener::class.java).flattenToString()
         Settings.Secure.putString(activity.contentResolver, "enabled_notification_listeners", listener)
@@ -259,7 +373,31 @@ class MainActivityTest {
 
     private fun settle() = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2))
 
+    private fun idleFor(millis: Long) = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(millis))
+
+    // By default Robolectric moves the clock forward on every frame, so a running animation
+    // plays to its end inside a single idleFor. Paused, frames only come as the test moves the
+    // clock, and the hop can be caught halfway.
+    private fun runFramesOnTheClock() = ShadowChoreographer.setPaused(true)
+
+    private fun sampleTheFirstHop(): List<HopSample> {
+        runFramesOnTheClock()
+        return List(HINT_OVER_MS.toInt() / 8) {
+            idleFor(8)
+            HopSample(SystemClock.uptimeMillis(), sheet.translationY, sheetHandle.chevron)
+        }
+    }
+
+    private data class HopSample(val time: Long, val y: Float, val chevron: Float)
+
     private companion object {
+        // The first hop starts a second after the app opens and takes 1.25s. HOP_TOP_MS into
+        // it the sheet is near the top, and HOP_END_MS later it has stopped bouncing.
+        // HINT_OVER_MS after opening, the first hint has played out.
+        const val HOP_TOP_MS = 300L
+        const val HOP_END_MS = 1400L
+        const val HINT_OVER_MS = 3000L
+
         val NOTIFICATION_ACCESS_SCREENS = setOf(
             Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS,
             Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS,
