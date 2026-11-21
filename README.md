@@ -28,12 +28,13 @@
 <p align="center">
   <img src="docs/images/card-next-to-map.png" alt="The DashGlance card with the time, date and current song next to Google Maps">
 </p>
+
+Screenshots from Google's Desktop Head Unit. Top: the card next to Google Maps. Bottom: the full-screen faces.
+
 <p align="center">
   <img src="docs/images/analog.png" alt="Full-screen analog face" width="49%">
   <img src="docs/images/digital.png" alt="Full-screen digital face" width="49%">
 </p>
-
-Screenshots from Google's Desktop Head Unit. Top: the card next to Google Maps. Bottom: the full-screen faces.
 
 <p align="center">
   <img src="docs/images/designs.png" alt="The clock designs you can pick on the phone, in four groups: phone brands, vintage cars, modern cars, and retro and sci-fi">
