@@ -66,7 +66,7 @@ class ClockMediaPlayerTest {
         player.refresh()
         idle()
 
-        assertEquals("Allow music controls in the DashGlance app", player.mediaMetadata.artist.toString())
+        assertEquals("Allow music controls in the DashGlance Card app", player.mediaMetadata.artist.toString())
     }
 
     @Test

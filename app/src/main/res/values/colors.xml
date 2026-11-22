@@ -6,8 +6,6 @@
     <color name="ic_launcher_background">@color/brand_orange</color>
 
     <!-- The DashGlance light accent from ClockPalette.Light. It's darker than the brand orange
-         so the music controls switch stands out on the light background. The pale one is the
-         same color at 35% for the switch's track when it's off. -->
+         so it stands out on the light background. -->
     <color name="accent">#FFD9480F</color>
-    <color name="accent_pale">#59D9480F</color>
 </resources>

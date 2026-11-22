@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The clock column and the design panel each take half the width. Both also use a weight
      inside, which lint flags as NestedWeights. The cost is an extra measure pass, which only
-     happens on rotation or when the music controls button shows or hides. -->
+     happens on rotation. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
@@ -38,21 +38,6 @@
             android:paddingTop="8dp"
             android:text="@string/phone_hint"
             android:textSize="14sp" />
-
-        <!-- Same switch as in the portrait layout, which explains the attributes. -->
-        <Switch
-            android:id="@+id/media_access"
-            style="@style/Widget.DashGlance.PillSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp"
-            android:minHeight="48dp"
-            android:saveEnabled="false"
-            android:switchPadding="16dp"
-            android:text="@string/media_access_toggle"
-            android:textSize="16sp"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <FrameLayout
             android:id="@+id/footer"

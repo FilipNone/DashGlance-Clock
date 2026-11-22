@@ -9,6 +9,7 @@ import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
@@ -26,6 +27,7 @@ class ClockMediaService : MediaLibraryService() {
     private lateinit var music: PhoneMusic
     private lateinit var player: ClockMediaPlayer
     private lateinit var session: MediaLibrarySession
+    private lateinit var nudge: SessionListNudge
 
     private val timeChanged = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -41,6 +43,13 @@ class ClockMediaService : MediaLibraryService() {
         session = MediaLibrarySession.Builder(this, player, LibraryCallback)
             .setSessionActivity(openPhoneApp())
             .build()
+        nudge = SessionListNudge(this)
+        // Without this, Android Auto often keeps the music app in the card for the whole drive.
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) nudge.nudge()
+            }
+        })
         music.refresh()
 
         // ACTION_TIME_TICK arrives at the start of every minute.
@@ -63,6 +72,7 @@ class ClockMediaService : MediaLibraryService() {
 
     override fun onDestroy() {
         unregisterReceiver(timeChanged)
+        nudge.release()
         music.release()
         session.release()
         player.release()

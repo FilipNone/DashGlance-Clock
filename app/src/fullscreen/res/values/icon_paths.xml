@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Our own drawing of the Android Auto mark: a triangle, and an arrow whose sides run
+     parallel to it and whose tips reach past its base. Both mirror around x = 54. The rounded
+     corners come from a round-joined stroke, so each shape is drawn slightly larger than its
+     path. -->
+<resources>
+    <string name="icon_triangle" translatable="false">M54,33.5 L74,66.15 L34,66.15 Z</string>
+    <string name="icon_arrow" translatable="false">M54,46.2 L69.28,71.6 L54,68.69 L38.72,71.6 Z</string>
+</resources>

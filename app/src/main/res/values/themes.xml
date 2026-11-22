@@ -3,15 +3,4 @@
     <style name="Theme.DashGlanceClock" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:colorAccent">@color/accent</item>
     </style>
-
-    <!-- The framework Switch with a pill track and a round white thumb. The Switch moves its own
-         thumb with a fixed accelerate-decelerate animation that can't be changed, so that thumb
-         is invisible and drawable/switch_track.xml draws and eases out the visible one. -->
-    <style name="Widget.DashGlance.PillSwitch" parent="android:Widget.Material.CompoundButton.Switch">
-        <item name="android:track">@drawable/switch_track</item>
-        <item name="android:thumb">@drawable/switch_thumb</item>
-        <item name="android:switchMinWidth">0dp</item>
-        <item name="android:showText">false</item>
-        <item name="android:splitTrack">false</item>
-    </style>
 </resources>

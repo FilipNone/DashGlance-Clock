@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The card app's mark on the 108-unit canvas, in the two colors of the Android Auto mark:
+     two orange eighth notes joined by a slanted beam, and a single paper eighth note on top of
+     the right one, shifted right and down. A thin gap in the dial's color keeps them apart. Each
+     head meets its stem with a rounded inner corner.
+
+     Each note is one filled outline with its strokes and overlaps already merged, so both icon
+     layers draw it the same way. branding.md says how to change them. -->
+<resources>
+    <string name="icon_note_back" translatable="false">M 62.56 33.29 A 1 1 0 0 0 62.28 33.31 L 42.55 37.69 A 1 1 0 0 0 41.77 38.67 L 41.77 55.53 A 1.8 1.8 0 0 1 40.04 57.29 L 40.04 57.29 A 4.59 5.42 70 0 0 34.64 63.83 A 4.59 5.42 70 0 0 45.04 61.06 A 1 1 0 0 0 45.05 60.88 L 45.05 42.68 L 60.22 39.32 L 60.22 51.39 A 1.8 1.8 0 0 1 58.59 53.18 A 1.8 1.8 0 0 1 58.49 53.19 L 58.49 53.19 A 4.59 5.42 70 0 0 53.09 59.73 A 4.59 5.42 70 0 0 55.45 62.15 C 54.96 60.57 55.25 58.99 56.02 57.79 C 56.84 56.5 58.14 55.59 59.55 55.08 C 60.26 54.82 61.01 54.66 61.76 54.62 C 61.82 54.62 61.89 54.61 61.96 54.61 C 62.01 54.55 62.04 54.47 62.04 54.37 L 62.04 54.37 L 62.04 37.87 A 2.2 2.2 0 0 1 63.5 35.8 L 63.5 34.29 A 1 1 0 0 0 62.56 33.29 z</string>
+    <string name="icon_note_front" translatable="false">M 69.77 35.75 A 0.9 0.9 0 0 0 69.53 35.77 L 64.04 36.99 A 0.9 0.9 0 0 0 63.34 37.87 L 63.34 54.39 A 1.66 1.66 0 0 1 62.17 55.96 A 4.22 4.98 70 0 0 56.78 62.04 A 4.22 4.98 70 0 0 66.35 59.48 A 0.9 0.9 0 0 0 66.36 59.38 L 66.36 40.64 L 69.91 39.86 A 0.9 0.9 0 0 0 70.62 38.98 L 70.62 36.65 A 0.9 0.9 0 0 0 69.77 35.75 z</string>
+</resources>

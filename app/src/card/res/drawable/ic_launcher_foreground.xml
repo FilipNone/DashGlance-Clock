@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The clock dial with the card app's music notes on it. Path data is in values/icon_paths.xml. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="@color/brand_ink"
+        android:pathData="@string/icon_dial" />
+
+    <path
+        android:pathData="@string/icon_major_ticks"
+        android:strokeWidth="2.6"
+        android:strokeColor="@color/brand_paper"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="@string/icon_minor_ticks"
+        android:strokeWidth="1.8"
+        android:strokeColor="@color/brand_paper"
+        android:strokeLineCap="round" />
+
+    <path
+        android:fillColor="@color/brand_orange"
+        android:pathData="@string/icon_note_back" />
+
+    <path
+        android:fillColor="@color/brand_paper"
+        android:pathData="@string/icon_note_front" />
+</vector>

@@ -21,7 +21,7 @@
 </p>
 
 > [!NOTE]
-> DashGlance Clock is a proof of concept. Android Auto has no proper place for a clock yet, so this app borrows the music card and the navigation screen. Expect rough edges until Android Auto opens up features like dashboard widgets.
+> DashGlance Clock is a proof of concept. Android Auto has no proper place for a clock yet, so its two apps borrow the music card and the navigation screen. Expect rough edges until Android Auto opens up features like dashboard widgets.
 
 ## Showcase
 
@@ -44,14 +44,16 @@ The other designs you can pick on your phone, as the car draws them. [docs/desig
 
 ## Features
 
-- The time and date in the music card next to the map, with the song playing on your phone
-- Play/pause, next and previous for whichever music app is playing
-- Full-screen analog and digital faces with seconds
-- 40 designs to pick from on your phone: Modern clocks, Vintage clocks, Retro and Sci-Fi. ([docs/designs.md](docs/designs.md))
-- 12- or 24-hour time from your phone settings, and the date in your language
-- No internet access, ads or tracking
+DashGlance comes as two apps. Install the one you need, or both:
 
-Android Auto shows one DashGlance icon for both the card and the full-screen clock, and picks which one opens.
+| App | Icon | What it does |
+|---|---|---|
+| DashGlance Card | clock dial with music notes | The time and date in the music card next to the map, with the song playing on your phone. Play/pause, next and previous go to whichever music app is playing. |
+| DashGlance Clock | clock dial with the Android Auto mark | Full-screen analog and digital faces with seconds, in 40 designs you pick on your phone: Modern clocks, Vintage clocks, Retro and Sci-Fi ([docs/designs.md](docs/designs.md)). |
+
+Both use 12- or 24-hour time from your phone settings and the date in your language. Neither has internet access, ads or tracking.
+
+DashGlance Card works in a car. DashGlance Clock only shows up on test head units like Google's Desktop Head Unit for now: in a car, Android Auto blocks full-screen apps that weren't installed from Google Play, and its Unknown sources setting doesn't cover them. [docs/android-auto.md](docs/android-auto.md) has the details.
 
 ## Installation
 
@@ -60,13 +62,17 @@ Android Auto shows one DashGlance icon for both the card and the full-screen clo
 <a href="https://f-droid.org/packages/com.filipnone.dashglanceclock/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="60"></a>
 -->
 
-1. Download the APK from the [latest release](https://github.com/FilipNone/DashGlance-Clock/releases/latest) and install it on your phone. It needs Android 8.0 or newer.
+1. Download from the [latest release](https://github.com/FilipNone/DashGlance-Clock/releases/latest) and install on your phone: `DashGlance-Card-*.apk` for the card next to the map, `DashGlance-Clock-*.apk` for the full-screen clock. They need Android 8.0 or newer.
 2. Android Auto hides apps that don't come from Google Play, so turn on its developer settings: open Android Auto's settings, tap Version 10 times, and confirm.
 3. In the ⋮ menu, open Developer settings and turn on Unknown sources.
-4. Open DashGlance on your phone and turn on Allow music controls. The first time, Android asks you to give DashGlance notification access. The app uses it to see and control your music app, and ignores your notifications. Turning the switch off later stops DashGlance from using the access; to remove the access itself, turn it off in Android's notification access settings.
-5. Connect to your car. DashGlance Clock is in the Android Auto app list.
+4. Open DashGlance Card on your phone and turn on Allow music controls. The first time, Android asks you to give it notification access. The app uses it to see and control your music app, and ignores your notifications. Turning the switch off later stops the app from using the access; to remove the access itself, turn it off in Android's notification access settings.
+5. Connect to your car. DashGlance Card is in the Android Auto app list, with music notes on its icon. With music controls on, the card next to the map shows the clock while your music plays and keeps it when you pause. Without them, your music app takes the card whenever it plays.
 
-While no car is connected, Android Auto's "Customize launcher" screen on the phone won't list the app. That's expected.
+If DashGlance Card is missing from the car's app list, check step 3 first: without Unknown sources, Android Auto hides it.
+
+While no car is connected, Android Auto's "Customize launcher" screen on the phone won't list the apps. That's expected.
+
+Updating from 0.2: install DashGlance Card over the old app. It replaces it and keeps your music controls setting. DashGlance Clock is a separate install and starts with the default designs.
 
 ## Contributing
 
@@ -75,9 +81,11 @@ Bug reports, ideas and pull requests are welcome in [Issues](https://github.com/
 You need JDK 17 or newer and the Android SDK with platform 37.
 
 ```sh
-./gradlew installDebug                 # build and install on a connected phone
-./gradlew testDebugUnitTest lintDebug  # tests and lint
+./gradlew installCardDebug installFullscreenDebug  # build and install both apps on a connected phone
+./gradlew test lintCardDebug lintFullscreenDebug   # tests and lint
 ```
+
+Both apps come from the one `app` module as the product flavors `card` and `fullscreen`.
 
 To see the car screen without a car, install the [Desktop Head Unit](https://developer.android.com/training/cars/testing/dhu), turn on Unknown sources as above, and run `scripts/dhu.sh --usb`. [docs/android-auto.md](docs/android-auto.md) covers the problems you may hit.
 

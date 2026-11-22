@@ -4,14 +4,12 @@ keep everything here short
 
 ## Files
 
+Two apps from one module, as product flavors of `app`: `card` (DashGlance Card, applicationId `com.filipnone.dashglanceclock`, the old single app's ID) and `fullscreen` (DashGlance Clock, `com.filipnone.dashglanceclock.fullscreen`). Separate packages because Android Auto drops a package's media service when the same package has a Car App Library service (docs/android-auto.md).
+
 ```
-app/src/main/kotlin/com/filipnone/dashglanceclock/
-  car/
-    ClockCarAppService.kt    entry point Android Auto binds to
-    ClockSession.kt          one car connection; wires screen and renderer together
-    ClockScreen.kt           NavigationTemplate with the analog/digital button; no design picker
-    ClockSurfaceRenderer.kt  draws onto the car surface once a second
-  clock/
+app/src/main/                shared by both apps
+  AndroidManifest.xml        application, MainActivity; flavors add their services
+  kotlin/.../clock/
     ClockRenderer.kt         draws a design, shared by car and phone
     AnalogFace.kt            analog drawing, driven by AnalogDesign data
     DigitalFace.kt           digital layout, driven by DigitalDesign data
@@ -23,23 +21,36 @@ app/src/main/kotlin/com/filipnone/dashglanceclock/
     DateFormats.kt           date styles in the phone's language
     ClockMath.kt             hand angles and tick timing
     SecondTicker.kt          main-thread callback each second, or 25 fps while a design moves (ClockDesign.motion)
-  media/
+  kotlin/.../ui/Credit.kt    GitHub credit link at the bottom of both phone screens
+  res/values/icon_paths.xml  icon dial and ticks; each flavor adds its mark
+app/src/fullscreen/          DashGlance Clock
+  kotlin/.../car/
+    ClockCarAppService.kt    entry point Android Auto binds to
+    ClockSession.kt          one car connection; wires screen and renderer together
+    ClockScreen.kt           NavigationTemplate with the analog/digital button; no design picker
+    ClockSurfaceRenderer.kt  draws onto the car surface once a second
+  kotlin/.../MainActivity.kt phone screen: clock, design sheet, credit
+  kotlin/.../ui/ClockView.kt     phone view that wraps ClockRenderer
+  kotlin/.../ui/DesignPicker.kt  live design previews, one sideways row per group
+  kotlin/.../ui/DesignSheet.kt   bottom sheet around the picker; pull up for all groups, clock shrinks; hops 1s after opening or a face switch
+  kotlin/.../ui/SheetHandle.kt   sheet's drag handle; the line bends into a ^ during the hop
+  res/layout-land/activity_main.xml   landscape: clock left, designs right, no sheet
+  res/drawable/ic_launcher_*.xml      icon with the Android Auto mark
+app/src/card/                DashGlance Card
+  kotlin/.../media/
     ClockMediaService.kt     media app whose card shows the clock next to the map
     ClockMediaPlayer.kt      silent Media3 player: clock artwork, controls go to PhoneMusic
     PhoneMusic.kt            finds the phone's active music app and controls it
     MediaControlListener.kt  notification listener; needed to read other apps' sessions
     MusicControls.kt         in-app on/off on top of notification access; off unbinds the listener
-  ui/ClockView.kt            phone view that wraps ClockRenderer
-  ui/DesignPicker.kt         live design previews, one sideways row per group
-  ui/DesignSheet.kt          bottom sheet around the picker; pull up for all groups, clock shrinks; hops 1s after opening or a face switch
-  ui/SheetHandle.kt          sheet's drag handle; the line bends into a ^ during the hop
-app/src/main/res/drawable/switch_*.xml   pill music-controls switch; ease-out animated-selector track, style in themes.xml
-  MainActivity.kt            phone screen: clock, design sheet, GitHub credit footer
-app/src/main/res/layout-land/activity_main.xml   landscape: clock left, designs right, no sheet
-app/src/main/res/drawable/ic_launcher_*.xml   app icon; shared paths in res/values/icon_paths.xml
+    SessionListNudge.kt      brief spare session after playback starts, so Android Auto re-reads the session order and gives the card to the clock
+  kotlin/.../MainActivity.kt phone screen: time and date preview, hint, music controls switch, credit
+  res/drawable/switch_*.xml  pill music-controls switch; ease-out animated-selector track, style in themes.xml
+  res/drawable/ic_launcher_*.xml      icon with music notes
+app/src/test, testCard, testFullscreen   JVM tests for shared code and each app
 scripts/dhu.sh               starts the Desktop Head Unit
-docs/branding.md             name, description, creator, colors, icon rules
-docs/android-auto.md         sideloading, CAR.VALIDATOR, DHU troubleshooting
+docs/branding.md             names, description, creator, colors, icon rules
+docs/android-auto.md         sideloading, CAR.VALIDATOR, DHU vs real car, media card rules, DHU troubleshooting
 docs/designs.md              design catalog, adding a design, brand names
 docs/images/                 README logo and showcase renders
 ```
@@ -62,8 +73,8 @@ The Android SDK is in `~/Android/Sdk`. Platform 37, build tools 36 and the Deskt
 ## Build and test
 
 ```sh
-./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
-./gradlew installDebug         # install on the connected phone
-./gradlew testDebugUnitTest    # JVM tests, Robolectric included
-./gradlew lintDebug
+./gradlew assembleDebug                           # app/build/outputs/apk/{card,fullscreen}/debug/
+./gradlew installCardDebug installFullscreenDebug # install both on the connected phone
+./gradlew test                                    # JVM tests for both apps, Robolectric included
+./gradlew lintCardDebug lintFullscreenDebug
 ```

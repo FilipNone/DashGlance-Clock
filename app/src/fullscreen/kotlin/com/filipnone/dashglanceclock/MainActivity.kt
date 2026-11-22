@@ -1,38 +1,26 @@
 package com.filipnone.dashglanceclock
 
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
-import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.filipnone.dashglanceclock.clock.ClockFace
 import com.filipnone.dashglanceclock.clock.ClockPalette
 import com.filipnone.dashglanceclock.clock.ClockPreferences
-import com.filipnone.dashglanceclock.media.MediaControlListener
-import com.filipnone.dashglanceclock.media.MusicControls
 import com.filipnone.dashglanceclock.ui.ClockView
 import com.filipnone.dashglanceclock.ui.DesignPicker
 import com.filipnone.dashglanceclock.ui.DesignSheet
 import com.filipnone.dashglanceclock.ui.SheetHandle
+import com.filipnone.dashglanceclock.ui.showCredit
 
 class MainActivity : ComponentActivity() {
-
-    private lateinit var mediaAccess: CompoundButton
-    private lateinit var musicControls: MusicControls
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -48,8 +36,6 @@ class MainActivity : ComponentActivity() {
         val designs = findViewById<DesignPicker>(R.id.designs)
         val footer = findViewById<View>(R.id.footer)
         val credit = findViewById<TextView>(R.id.credit)
-        mediaAccess = findViewById(R.id.media_access)
-        musicControls = MusicControls(this)
         // Only the portrait layout has the sheet's header and handle.
         val sheetHeader: View? = findViewById(R.id.design_sheet_header)
         val sheetHandle: SheetHandle? = findViewById(R.id.design_sheet_handle)
@@ -84,26 +70,7 @@ class MainActivity : ComponentActivity() {
             null
         }
 
-        val appName = getString(R.string.app_name)
-        val creatorName = getString(R.string.creator_name)
-        credit.text = getString(R.string.credit, appName, creatorName)
-        credit.contentDescription = getString(R.string.credit_description, appName, creatorName)
-        credit.setTextColor(palette.accent)
-        val gitHubMark = checkNotNull(ContextCompat.getDrawable(this, R.drawable.ic_github)).mutate()
-        gitHubMark.setTint(palette.accent)
-        credit.setCompoundDrawablesRelativeWithIntrinsicBounds(gitHubMark, null, null, null)
-        credit.setOnClickListener { openCreatorPage() }
-
-        // Turning the switch off only turns music controls off in the app; the notification
-        // access stays granted. Turning it on opens Android's settings only if access was never
-        // granted or has been revoked there, and onResume then shows what the user chose.
-        // Setting the switch to the current state doesn't count as a flip.
-        mediaAccess.setTextColor(palette.primaryText)
-        mediaAccess.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked == musicControls.isOn) return@setOnCheckedChangeListener
-            musicControls.isEnabled = isChecked
-            if (isChecked && !musicControls.hasAccess) openNotificationAccessSettings()
-        }
+        credit.showCredit(palette.accent)
 
         val preferences = ClockPreferences(this)
         // Switching faces, from the phone or the car, makes the sheet hop again. Picking a
@@ -141,39 +108,6 @@ class MainActivity : ComponentActivity() {
             }
             insets
         }
-    }
-
-    // The user may have just come back from the settings screen, with access turned on or off.
-    override fun onResume() {
-        super.onResume()
-        mediaAccess.isChecked = musicControls.isOn
-    }
-
-    private fun openNotificationAccessSettings() {
-        val detail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS).putExtra(
-                Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
-                ComponentName(this, MediaControlListener::class.java).flattenToString(),
-            )
-        } else {
-            null
-        }
-        val opened = (detail != null && tryStart(detail)) ||
-            tryStart(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        // With no settings screen to open, nothing can change, so the switch flips back.
-        if (!opened) mediaAccess.isChecked = musicControls.isOn
-    }
-
-    // No app on the phone can open web links if this fails, so the tap does nothing.
-    private fun openCreatorPage() {
-        tryStart(Intent(Intent.ACTION_VIEW, getString(R.string.creator_url).toUri()))
-    }
-
-    private fun tryStart(intent: Intent): Boolean = try {
-        startActivity(intent)
-        true
-    } catch (_: ActivityNotFoundException) {
-        false
     }
 
     private companion object {

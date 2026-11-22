@@ -11,8 +11,23 @@ android {
         // java.time needs API 26. Going lower means turning on core library desugaring.
         minSdk = 26
         targetSdk = 37
-        versionCode = 3
-        versionName = "0.2.1-beta"
+        versionCode = 4
+        versionName = "0.3.0-beta"
+    }
+
+    // Two apps from one module. Android Auto drops a package's media service when the same
+    // package has a Car App Library service, so the music card and the full-screen clock only
+    // both show up as separate packages. The card keeps the old single app's ID, so updating
+    // 0.2 installs it and keeps the music controls setting.
+    flavorDimensions += "app"
+    productFlavors {
+        create("fullscreen") {
+            dimension = "app"
+            applicationIdSuffix = ".fullscreen"
+        }
+        create("card") {
+            dimension = "app"
+        }
     }
 
     // The keystore and passwords live outside the repo, in ~/.gradle/gradle.properties.
@@ -50,16 +65,16 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.car.app)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.lifecycle.common)
-    implementation(libs.androidx.media3.session)
     implementation(libs.androidx.annotation)
-    implementation(libs.material)
+    "fullscreenImplementation"(libs.androidx.car.app)
+    "fullscreenImplementation"(libs.material)
+    "cardImplementation"(libs.androidx.media3.session)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
-    testImplementation(libs.androidx.car.app.testing)
+    "testFullscreenImplementation"(libs.androidx.car.app.testing)
 }

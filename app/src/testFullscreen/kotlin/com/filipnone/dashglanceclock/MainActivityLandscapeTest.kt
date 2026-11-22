@@ -69,14 +69,6 @@ class MainActivityLandscapeTest {
         assertTrue(right(selected) <= right(reopenedPanel))
     }
 
-    @Test
-    fun musicControlsSwitchSitsUnderTheClock() {
-        val musicControls = activity.findViewById<View>(R.id.media_access)
-
-        assertTrue(musicControls.isShown)
-        assertTrue(top(musicControls) >= bottom(clock))
-        assertTrue(bottom(musicControls) <= top(credit))
-    }
 
     @Test
     fun creditSitsUnderTheClock() {

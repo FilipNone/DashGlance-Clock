@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Path data shared by ic_launcher_foreground and ic_launcher_monochrome, on the 108-unit
-     adaptive icon canvas. Everything is mirror-symmetric around x = 54. The rounded corners
-     come from a round-joined stroke, so each shape is drawn slightly larger than its path. -->
+<!-- The dial and ticks both app icons share, on the 108-unit adaptive icon canvas. Each app
+     draws its own mark on the dial: the Android Auto mark (fullscreen) or a music note (card),
+     with its paths in that flavor's values/icon_paths.xml. -->
 <resources>
     <string name="icon_dial" translatable="false">M54,22 A32,32 0 1,1 54,86 A32,32 0 1,1 54,22 Z</string>
     <string name="icon_major_ticks" translatable="false">M54,27.4 L54,24.4 M80.6,54 L83.6,54 M54,80.6 L54,83.6 M27.4,54 L24.4,54</string>
     <string name="icon_minor_ticks" translatable="false">M68.1,29.58 L68.8,28.37 M78.42,39.9 L79.63,39.2 M78.42,68.1 L79.63,68.8 M68.1,78.42 L68.8,79.63 M39.9,78.42 L39.2,79.63 M29.58,68.1 L28.37,68.8 M29.58,39.9 L28.37,39.2 M39.9,29.58 L39.2,28.37</string>
-    <!-- Our own drawing of the Android Auto mark: a triangle, and an arrow whose sides run
-         parallel to it and whose tips reach past its base. -->
-    <string name="icon_triangle" translatable="false">M54,33.5 L74,66.15 L34,66.15 Z</string>
-    <string name="icon_arrow" translatable="false">M54,46.2 L69.28,71.6 L54,68.69 L38.72,71.6 Z</string>
 </resources>

@@ -1,66 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<!-- Shared by both apps. The fullscreen and card flavors add their Android Auto services in
+     their own manifests. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- The full-screen clock uses NavigationTemplate, which only apps in the NAVIGATION
-         category can use. ACCESS_SURFACE gives the app the canvas to draw on. -->
-    <uses-permission android:name="androidx.car.app.NAVIGATION_TEMPLATES" />
-    <uses-permission android:name="androidx.car.app.ACCESS_SURFACE" />
-
-    <!-- MissingIntentFilterForMediaSearch: DashGlance has no music of its own, so voice
-         requests such as "play some jazz" should go to the real music app. -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DashGlanceClock"
-        tools:ignore="MissingIntentFilterForMediaSearch">
+        android:theme="@style/Theme.DashGlanceClock">
 
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
-
-        <meta-data
-            android:name="androidx.car.app.minCarApiLevel"
-            android:value="1" />
-
-        <service
-            android:name=".car.ClockCarAppService"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="androidx.car.app.CarAppService" />
-                <category android:name="androidx.car.app.category.NAVIGATION" />
-            </intent-filter>
-        </service>
-
-        <!-- Shows the clock in Android Auto's media card, next to the map. It plays no audio. -->
-        <service
-            android:name=".media.ClockMediaService"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="androidx.media3.session.MediaLibraryService" />
-                <action android:name="android.media.browse.MediaBrowserService" />
-            </intent-filter>
-        </service>
-
-        <!-- Notification access is the only way to see and control other apps' media
-             sessions. The listener itself ignores notifications. -->
-        <service
-            android:name=".media.MediaControlListener"
-            android:exported="false"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService" />
-            </intent-filter>
-        </service>
 
         <activity
             android:name=".MainActivity"

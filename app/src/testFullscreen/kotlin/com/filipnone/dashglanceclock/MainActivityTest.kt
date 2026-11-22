@@ -1,20 +1,13 @@
 package com.filipnone.dashglanceclock
 
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Looper
 import android.os.SystemClock
-import android.provider.Settings
 import android.view.View
-import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.test.core.app.ApplicationProvider
 import com.filipnone.dashglanceclock.clock.ClockFace
 import com.filipnone.dashglanceclock.clock.ClockPreferences
-import com.filipnone.dashglanceclock.media.MediaControlListener
-import com.filipnone.dashglanceclock.media.MusicControls
 import com.filipnone.dashglanceclock.ui.ClockView
 import com.filipnone.dashglanceclock.ui.SheetHandle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -36,14 +29,6 @@ import java.time.Duration
 @Config(qualifiers = "en-w400dp-h860dp")
 class MainActivityTest {
 
-    init {
-        // NotificationManagerCompat keeps the last listener list in a static field and returns
-        // it while the setting is missing, so access granted in an earlier test would leak into
-        // this one. Revoking access on a phone leaves an empty list, which is what this sets.
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        Settings.Secure.putString(context.contentResolver, "enabled_notification_listeners", "")
-    }
-
     private val controller = Robolectric.buildActivity(MainActivity::class.java).setup()
     private val activity = controller.get()
     private val credit = activity.findViewById<TextView>(R.id.credit)
@@ -54,7 +39,6 @@ class MainActivityTest {
     private val sheetHeader = activity.findViewById<View>(R.id.design_sheet_header)
     private val sheetHandle = activity.findViewById<SheetHandle>(R.id.design_sheet_handle)
     private val behavior = BottomSheetBehavior.from(sheet)
-    private val musicControls = activity.findViewById<CompoundButton>(R.id.media_access)
     private val preferences = ClockPreferences(activity)
 
     init {
@@ -68,72 +52,9 @@ class MainActivityTest {
         assertEquals("Tap the clock to switch between analog and digital", hint.text.toString())
     }
 
-    @Test
-    fun musicControlsSwitch_isOff_withoutNotificationAccess() {
-        assertEquals("Allow music controls", musicControls.text.toString())
-        assertTrue(musicControls.isShown)
-        assertFalse(musicControls.isChecked)
-    }
 
-    @Test
-    fun musicControlsSwitch_isOn_onceAccessIsGranted() {
-        grantNotificationAccess()
-        controller.pause().resume()
 
-        assertTrue(musicControls.isChecked)
-    }
 
-    @Test
-    fun turningTheSwitchOn_withoutAccess_opensNotificationAccessSettings() {
-        musicControls.performClick()
-
-        val intent = shadowOf(activity).nextStartedActivity
-        assertTrue(intent.action in NOTIFICATION_ACCESS_SCREENS)
-    }
-
-    @Test
-    fun switchFlipsBack_whenTheUserReturnsWithoutGrantingAccess() {
-        musicControls.performClick()
-        controller.pause().resume()
-
-        assertFalse(musicControls.isChecked)
-    }
-
-    @Test
-    fun turningTheSwitchOff_staysInTheApp() {
-        grantNotificationAccess()
-        controller.pause().resume()
-
-        musicControls.performClick()
-
-        assertNull(shadowOf(activity).nextStartedActivity)
-        assertFalse(musicControls.isChecked)
-        assertFalse(MusicControls(activity).isOn)
-        controller.pause().resume()
-        assertFalse(musicControls.isChecked)
-    }
-
-    @Test
-    fun turningTheSwitchBackOn_withAccessStillGranted_staysInTheApp() {
-        grantNotificationAccess()
-        MusicControls(activity).isEnabled = false
-        controller.pause().resume()
-        assertFalse(musicControls.isChecked)
-
-        musicControls.performClick()
-
-        assertNull(shadowOf(activity).nextStartedActivity)
-        assertTrue(musicControls.isChecked)
-        assertTrue(MusicControls(activity).isOn)
-    }
-
-    @Test
-    fun syncingTheSwitchOnResume_doesNotOpenSettings() {
-        grantNotificationAccess()
-        controller.pause().resume()
-
-        assertNull(shadowOf(activity).nextStartedActivity)
-    }
 
     @Test
     fun creditNamesTheAppAndItsCreator_nextToTheGitHubMark() {
@@ -355,11 +276,6 @@ class MainActivityTest {
         return matches.single()
     }
 
-    private fun grantNotificationAccess() {
-        val listener = ComponentName(activity, MediaControlListener::class.java).flattenToString()
-        Settings.Secure.putString(activity.contentResolver, "enabled_notification_listeners", listener)
-    }
-
     private fun clickLabel(view: View): String? =
         AccessibilityNodeInfoCompat.wrap(view.createAccessibilityNodeInfo()).actionList
             .single { it.id == AccessibilityNodeInfoCompat.ACTION_CLICK }
@@ -397,10 +313,5 @@ class MainActivityTest {
         const val HOP_TOP_MS = 300L
         const val HOP_END_MS = 1400L
         const val HINT_OVER_MS = 3000L
-
-        val NOTIFICATION_ACCESS_SCREENS = setOf(
-            Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS,
-            Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS,
-        )
     }
 }

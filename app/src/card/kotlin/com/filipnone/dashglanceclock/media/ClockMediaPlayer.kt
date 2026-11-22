@@ -36,7 +36,7 @@ class ClockMediaPlayer(
     private val now: () -> LocalDateTime = LocalDateTime::now,
 ) : SimpleBasePlayer(Looper.getMainLooper()) {
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM")
+    private val dateFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN)
     private val palette = ClockPalette.Dark
     // Android Auto dims card artwork to about 40% under its own overlay, so the digits are
     // pure white and a heavier weight than the car screen's clock.
@@ -139,16 +139,17 @@ class ClockMediaPlayer(
         return artwork
     }
 
-    private companion object {
-        const val CLOCK_ITEM_ID = "clock"
-        const val ARTWORK_SIZE = 320
-        const val REFERENCE_TEXT_SIZE = 100f
+    companion object {
+        const val DATE_PATTERN = "EEEE d MMMM"
+        private const val CLOCK_ITEM_ID = "clock"
+        private const val ARTWORK_SIZE = 320
+        private const val REFERENCE_TEXT_SIZE = 100f
 
         // Fractions of the artwork. The card crops the square to its own shape, and on a
         // 1280 x 720 screen only the middle 52% of the width stays visible. The card's text
         // covers the bottom 45%.
-        const val DIGITS_CENTER_Y = 0.3f
-        const val DIGITS_MAX_WIDTH = 0.46f
-        const val DIGITS_MAX_HEIGHT = 0.26f
+        private const val DIGITS_CENTER_Y = 0.3f
+        private const val DIGITS_MAX_WIDTH = 0.46f
+        private const val DIGITS_MAX_HEIGHT = 0.26f
     }
 }
