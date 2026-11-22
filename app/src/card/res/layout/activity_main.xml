@@ -1,65 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One layout for both orientations. The column scrolls when a landscape phone is too short
-     for it, and the credit stays at the bottom. -->
+<!-- Portrait: the card preview, hint and music controls switch, with the designs in a bottom
+     sheet underneath. The landscape layout has no sheet, so the sheet's header and handle
+     exist only here; MainActivity checks for them. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/scroll"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:layout_weight="1">
 
         <LinearLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="16dp">
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <com.filipnone.dashglanceclock.ui.CardPreview
                 android:id="@+id/preview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="280dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="28dp">
-
-                <TextClock
-                    android:id="@+id/time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFeatureSettings="tnum"
-                    android:format12Hour="h:mm"
-                    android:format24Hour="HH:mm"
-                    android:textSize="88sp" />
-
-                <TextClock
-                    android:id="@+id/date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp" />
-
-            </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/clock_content_description" />
 
             <TextView
                 android:id="@+id/hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:maxWidth="420dp"
-                android:text="@string/card_hint"
+                android:paddingHorizontal="24dp"
                 android:textSize="14sp" />
 
             <!-- A framework Switch: SwitchCompat and MaterialSwitch need an AppCompat or
@@ -70,7 +50,8 @@
                 style="@style/Widget.DashGlance.PillSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:minHeight="48dp"
                 android:saveEnabled="false"
                 android:switchPadding="16dp"
@@ -80,7 +61,48 @@
 
         </LinearLayout>
 
-    </ScrollView>
+        <LinearLayout
+            android:id="@+id/design_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="6dp"
+            android:orientation="vertical"
+            app:gestureInsetBottomIgnored="true"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+            <LinearLayout
+                android:id="@+id/design_sheet_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                tools:ignore="InconsistentLayout">
+
+                <!-- 16dp tall so the ^ fits. The 4dp line runs across its middle, 14dp below
+                     the top of the sheet. -->
+                <com.filipnone.dashglanceclock.ui.SheetHandle
+                    android:id="@+id/design_sheet_handle"
+                    android:layout_width="32dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    tools:ignore="InconsistentLayout" />
+
+                <include layout="@layout/design_title_row" />
+
+            </LinearLayout>
+
+            <com.filipnone.dashglanceclock.ui.DesignPicker
+                android:id="@+id/designs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp" />
+
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <FrameLayout
         android:id="@+id/footer"

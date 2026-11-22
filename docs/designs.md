@@ -1,6 +1,6 @@
 # Clock designs
 
-Designs are picked on the phone only. The car keeps its single analog/digital button, and draws whichever design the phone saved for that face. Each face remembers its own design (`analog_design`, `digital_design` in the `clock` prefs file).
+Designs are picked on the phone only. In DashGlance Clock the car keeps its single analog/digital button, and draws whichever design the phone saved for that face. Each face remembers its own design (`analog_design`, `digital_design` in the `clock` prefs file). DashGlance Card has its own picker, described at the end.
 
 In portrait the designs sit in a bottom sheet under the clock. Collapsed, it shows the first group; pulling it up or tapping its header shows the rest, and each group is a row you swipe sideways. In short windows such as split screen, the collapsed sheet shows only its header. A second after the app opens, and a second after a face switch, the collapsed sheet rises 48dp to peek at the next group while its handle bends from a line into a ^. It holds there for 50ms, then drops like a ball and bounces twice, to 16% and 4% of the lift; the ^ flattens as it lands. The whole hop takes about 1.25s. Dragging or tapping the sheet stops the hop. In landscape (`layout-land`) the screen splits in half: the clock and credit on the left, the full design list on the right, opened at the selected design.
 
@@ -45,6 +45,19 @@ The retro and sci-fi designs are not copies of a particular screen:
 - Flip clock puts the hours and minutes on split cards. When the minute changes, each card that changes turns over: the top flap falls forward and the bottom flap lands over the old number, in half a second.
 
 Cyberpunk 2077 and Tron Legacy are animated all the time. While one of them is showing, the phone and the car redraw the clock 25 times a second instead of once. The flip clock only redraws that fast for the half second its cards turn.
+
+## In DashGlance Card
+
+The card app has the same picker, with its own choices (`card` prefs file, digital DashGlance by default) and a Stacked switch above the digital list. Stacked (`DigitalDesign.stacked`) puts the hours above the minutes with no colon, so the digits fill more of the narrow card. The previews always use the night palette, because the card is always dark.
+
+`CardDesigns` decides which designs the card offers:
+
+- Animated all the time (Cyberpunk 2077, Tron Legacy): left out. The card only changes once a minute, so they would freeze mid-effect.
+- Low contrast: left out. Android Auto dims the card picture so that black is 28/255 and white 97/255. A design stays only if its hands or digits keep a contrast ratio of at least 2:1 against the dial or panel behind them, measured after that dimming. That drops Material You (both), Mercedes 1970s, Porsche 1970s, Chevrolet 1950s, Cadillac 1980s, Volkswagen 1990s and Nixie tube; 30 designs remain.
+- Lagonda 1976 has a card version (`CardDesigns.LagondaForCard`, same id). Its red LEDs measure 1.45:1 on the card, so each segment gets a pale core (`#FFB0A0`) inside a full red glow, on darker cells, and the digits are thicker and closer together. That measures 2.06:1.
+- On the card, every design loses its second hand or seconds, its date (the card's title already has it), AM/PM, the blinking colon and the flip animation.
+
+A design picked earlier that a later version leaves out falls back to DashGlance.
 
 ## Adding a design
 

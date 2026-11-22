@@ -18,7 +18,7 @@ class ClockView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : View(context, attrs, defStyleAttr) {
+) : View(context, attrs, defStyleAttr), PartlyCovered {
 
     private val renderer = ClockRenderer()
     private val ticker = SecondTicker { invalidate() }
@@ -40,11 +40,20 @@ class ClockView @JvmOverloads constructor(
             invalidate()
         }
 
-    // Pixels at the bottom that something else covers. The card and clock are drawn in the rest.
-    var coveredBottom: Int = 0
+    // The card and clock are drawn above the covered part.
+    override var coveredBottom: Int = 0
         set(value) {
             if (field == value) return
             field = value
+            invalidate()
+        }
+
+    // Android Auto's media card is always dark, so DashGlance Card shows its designs in their
+    // dark colors even when the phone is in light mode.
+    var alwaysDark: Boolean = false
+        set(value) {
+            field = value
+            updatePalette()
             invalidate()
         }
 
@@ -53,7 +62,7 @@ class ClockView @JvmOverloads constructor(
     }
 
     private fun updatePalette() {
-        val isDarkMode = resources.configuration.uiMode and
+        val isDarkMode = alwaysDark || resources.configuration.uiMode and
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         renderer.palette = design.palette(context, isDarkMode)
     }

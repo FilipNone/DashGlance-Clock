@@ -17,8 +17,6 @@ import androidx.core.view.doOnLayout
 import androidx.core.widget.NestedScrollView
 import com.filipnone.dashglanceclock.R
 import com.filipnone.dashglanceclock.clock.ClockDesign
-import com.filipnone.dashglanceclock.clock.ClockDesigns
-import com.filipnone.dashglanceclock.clock.ClockFace
 import com.filipnone.dashglanceclock.clock.ClockPalette
 import com.filipnone.dashglanceclock.clock.DesignGroup
 import kotlin.math.roundToInt
@@ -33,9 +31,12 @@ class DesignPicker @JvmOverloads constructor(
 
     var onPick: ((ClockDesign) -> Unit)? = null
 
+    // Shows the previews in their dark colors whatever the phone's mode. See ClockView.
+    var alwaysDark: Boolean = false
+
     private val groups = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-    private val tiles = LinkedHashMap<String, View>()
-    private var shownFace: ClockFace? = null
+    private val tiles = LinkedHashMap<String, Tile>()
+    private var shownDesigns: List<ClockDesign> = emptyList()
     private var shownChrome: ClockPalette? = null
 
     init {
@@ -46,19 +47,23 @@ class DesignPicker @JvmOverloads constructor(
     val firstGroupBottom: Int
         get() = groups.top + (groups.getChildAt(0)?.bottom ?: 0)
 
-    // The tiles are only rebuilt when the face or colors change. Picking a design just moves
-    // the outline, so the rows stay where the user scrolled them. After a rebuild, the list
-    // scrolls down to the selected design's group if needed, and its row scrolls sideways to it.
-    fun show(face: ClockFace, selected: ClockDesign, chrome: ClockPalette) {
-        val rebuild = face != shownFace || chrome != shownChrome
+    // The tiles are only rebuilt when the list of designs or the colors change. Picking a
+    // design just moves the outline, and new versions of the same designs (DashGlance Card's
+    // stacked ones) just redraw the previews, so the rows stay where the user scrolled them.
+    // After a rebuild, the list scrolls down to the selected design's group if needed, and its
+    // row scrolls sideways to it.
+    fun show(designs: List<ClockDesign>, selected: ClockDesign, chrome: ClockPalette) {
+        val rebuild = designs.map { it.id } != shownDesigns.map { it.id } || chrome != shownChrome
         if (rebuild) {
-            build(face, chrome)
-            shownFace = face
+            build(designs, chrome)
             shownChrome = chrome
+        } else {
+            designs.forEach { tiles[it.id]?.preview?.design = it }
         }
-        tiles.forEach { (id, tile) -> tile.isSelected = id == selected.id }
+        shownDesigns = designs
+        tiles.forEach { (id, tile) -> tile.view.isSelected = id == selected.id }
         if (rebuild) {
-            tiles[selected.id]?.let { tile -> doOnLayout { scrollToTile(tile) } }
+            tiles[selected.id]?.let { tile -> doOnLayout { scrollToTile(tile.view) } }
         }
     }
 
@@ -73,10 +78,10 @@ class DesignPicker @JvmOverloads constructor(
         }
     }
 
-    private fun build(face: ClockFace, chrome: ClockPalette) {
+    private fun build(designs: List<ClockDesign>, chrome: ClockPalette) {
         groups.removeAllViews()
         tiles.clear()
-        for ((group, designs) in ClockDesigns.forFace(face).groupBy { it.group }) {
+        for ((group, designs) in designs.groupBy { it.group }) {
             val section = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
             section.addView(
                 TextView(context).apply {
@@ -93,7 +98,7 @@ class DesignPicker @JvmOverloads constructor(
             for (design in designs) {
                 val tile = tile(design, chrome)
                 tiles[design.id] = tile
-                row.addView(tile)
+                row.addView(tile.view)
             }
             section.addView(
                 HorizontalScrollView(context).apply {
@@ -106,7 +111,9 @@ class DesignPicker @JvmOverloads constructor(
         }
     }
 
-    private fun tile(design: ClockDesign, chrome: ClockPalette): View {
+    private class Tile(val view: View, val preview: ClockView)
+
+    private fun tile(design: ClockDesign, chrome: ClockPalette): Tile {
         val tile = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
@@ -119,6 +126,7 @@ class DesignPicker @JvmOverloads constructor(
             setOnClickListener { onPick?.invoke(design) }
         }
         val preview = ClockView(context).apply {
+            alwaysDark = this@DesignPicker.alwaysDark
             this.design = design
             cornerRadius = dp(12).toFloat()
             setPadding(dp(6), dp(6), dp(6), dp(6))
@@ -137,7 +145,7 @@ class DesignPicker @JvmOverloads constructor(
             label,
             LinearLayout.LayoutParams(dp(PREVIEW_WIDTH_DP), WRAP_CONTENT).apply { topMargin = dp(4) },
         )
-        return tile
+        return Tile(tile, preview)
     }
 
     private fun selectionBackground(chrome: ClockPalette): Drawable = StateListDrawable().apply {

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The preview column and the design panel each take half the width. Both also use a weight
+     inside, which lint flags as NestedWeights. The cost is an extra measure pass, which only
+     happens on rotation. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <com.filipnone.dashglanceclock.ui.CardPreview
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/clock_content_description"
+            tools:ignore="NestedWeights" />
+
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:textSize="14sp" />
+
+        <Switch
+            android:id="@+id/media_access"
+            style="@style/Widget.DashGlance.PillSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:saveEnabled="false"
+            android:switchPadding="16dp"
+            android:text="@string/media_access_toggle"
+            android:textSize="16sp"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        <FrameLayout
+            android:id="@+id/footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/credit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/design_panel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <include layout="@layout/design_title_row" />
+
+        <com.filipnone.dashglanceclock.ui.DesignPicker
+            android:id="@+id/designs"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            tools:ignore="NestedWeights" />
+
+    </LinearLayout>
+
+</LinearLayout>

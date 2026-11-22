@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">DashGlance Card</string>
-    <string name="card_hint">Android Auto shows this clock in its music card, next to the map. With music controls on, the card stays on the clock while your music plays, and its buttons control your music app.</string>
+    <string name="card_hint">Android Auto shows this clock in its music card, next to the map.</string>
+    <!-- The card hint above the shared tap hint. -->
+    <string name="card_hints" translatable="false">%1$s\n%2$s</string>
     <string name="media_access_toggle">Allow music controls</string>
     <string name="media_needs_access">Allow music controls in the DashGlance Card app</string>
+    <string name="stacked_toggle">Stacked</string>
 </resources>

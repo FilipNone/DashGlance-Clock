@@ -85,7 +85,13 @@ internal class DigitalFace(private val locale: Locale) {
         val hoursWidth = if (wholeCells) max(hoursText, digits.width("00", 1f)) else hoursText
         val colonWidth = digits.width(":", 1f)
         val minutesWidth = digits.width(minutes, 1f)
-        val timeWidth = hoursWidth + gap + colonWidth + gap + minutesWidth + overhang
+        // Stacked, the time is two rows: the hours, then the minutes, with no colon. The gap
+        // between them leaves room for the padding of both rows' cells.
+        val stacked = design.stacked
+        val digitsWidth = if (stacked) max(hoursWidth, minutesWidth) else hoursWidth + gap + colonWidth + gap + minutesWidth
+        val timeWidth = digitsWidth + overhang
+        val rowGap = STACK_GAP + 2f * (design.cells?.padding ?: 0f)
+        val timeHeight = if (stacked) 2f + rowGap else 1f
         val sideWidth = max(
             seconds?.let { digits.width(it, SIDE_SIZE) + digits.overhang(SIDE_SIZE) } ?: 0f,
             sideAmPm?.let { labels.width(it, SIDE_SIZE) } ?: 0f,
@@ -93,7 +99,11 @@ internal class DigitalFace(private val locale: Locale) {
         val rowWidth = if (sideWidth > 0f) timeWidth + SIDE_GAP + sideWidth else timeWidth
         // A date lined up with the time's right edge can be the wider of the two. The time then
         // moves right to keep the edges together.
-        val dateWidth = if (dateAtEnd && datePainter != null) textWidth(datePainter, date, look.size, look.trace) else 0f
+        val dateWidth = if (dateAtEnd && datePainter != null) {
+            textWidth(datePainter, date, look.size, look.trace) + traceLead(look.size, look.trace)
+        } else {
+            0f
+        }
         val contentWidth = max(rowWidth, dateWidth)
 
         val dateRoom = when {
@@ -108,7 +118,7 @@ internal class DigitalFace(private val locale: Locale) {
         val padding = (design.panel?.padding ?: 0f) + cellPadding
         val sidePadding = (design.panel?.sidePadding ?: 0f) + cellPadding + shift
         val blockWidth = contentWidth + 2f * sidePadding
-        val blockHeight = 1f + dateRoom + ruleRoom + 2f * padding
+        val blockHeight = timeHeight + dateRoom + ruleRoom + 2f * padding
 
         val unit = min(
             area.width() * FILL / blockWidth,
@@ -174,7 +184,9 @@ internal class DigitalFace(private val locale: Locale) {
         }
 
         var y = blockTop + padding * unit
+        // The baseline of the hours, which is also the minutes' baseline unless stacked.
         val timeBaseline = y + (if (look != null && dateAbove) look.size + look.gap else 0f) * unit + unit
+        val minutesDrop = if (stacked) (1f + rowGap) * unit else 0f
         // The bottom right corner of the digits, which a date at the end lines up with.
         val timeRight = rowLeft + (timeWidth - overhang) * unit
 
@@ -187,7 +199,7 @@ internal class DigitalFace(private val locale: Locale) {
                 TextAlign.END -> timeRight - area.left - margin
             }
             var height = look.size * unit
-            val width = textWidth(painter, text, height, look.trace)
+            val width = textWidth(painter, text, height, look.trace) + traceLead(height, look.trace)
             if (width > maxWidth) height *= maxWidth / width
             val shown = textWidth(painter, text, height, look.trace)
             val dateLeft = when (align) {
@@ -222,9 +234,16 @@ internal class DigitalFace(private val locale: Locale) {
         } else {
             palette.color(design.colonInk)
         }
-        val hoursLeft = rowLeft + (hoursWidth - hoursText) * unit / 2f
+        // Stacked rows line up with each other the way the design aligns its text.
+        fun stackedRowLeft(width: Float): Float = rowLeft + unit * when (design.align) {
+            TextAlign.CENTER -> (digitsWidth - width) / 2f
+            TextAlign.START -> 0f
+            TextAlign.END -> digitsWidth - width
+        }
+        val hoursSlot = if (stacked) stackedRowLeft(hoursWidth) else rowLeft
+        val hoursLeft = hoursSlot + (hoursWidth - hoursText) * unit / 2f
         val colonLeft = rowLeft + (hoursWidth + gap) * unit
-        val minutesLeft = colonLeft + (colonWidth + gap) * unit
+        val minutesLeft = if (stacked) stackedRowLeft(minutesWidth) else colonLeft + (colonWidth + gap) * unit
         val sideLeft = rowLeft + (timeWidth + SIDE_GAP) * unit
         val sideHeight = SIDE_SIZE * unit
 
@@ -239,17 +258,19 @@ internal class DigitalFace(private val locale: Locale) {
             digits.draw(canvas, text, textLeft, baseline, height, color, palette.unlit, digitGlow)
         }
 
-        // The whole time row, moved by dx. A tint repaints every part in one color.
+        // The whole time, moved by dx. A tint repaints every part in one color. Seconds share
+        // the minutes' baseline.
         fun drawTime(dx: Float, dy: Float, @ColorInt tint: Int?, rowGlow: Glow?) {
             val base = y + dy
             drawDigits(hours, hoursLeft + dx, base, unit, tint ?: palette.color(design.hoursInk), rowGlow)
-            if (design.colon) {
+            if (design.colon && !stacked) {
                 val color = if (tint != null && Color.alpha(colonColor) > 0) tint else colonColor
                 drawDigits(":", colonLeft + dx, base, unit, color, rowGlow)
             }
-            drawDigits(minutes, minutesLeft + dx, base, unit, tint ?: palette.color(design.minutesInk), rowGlow)
+            val minutesBase = base + minutesDrop
+            drawDigits(minutes, minutesLeft + dx, minutesBase, unit, tint ?: palette.color(design.minutesInk), rowGlow)
             if (seconds != null) {
-                drawDigits(seconds, sideLeft + dx, base, sideHeight, tint ?: palette.color(design.secondsInk), rowGlow)
+                drawDigits(seconds, sideLeft + dx, minutesBase, sideHeight, tint ?: palette.color(design.secondsInk), rowGlow)
             }
         }
 
@@ -270,16 +291,24 @@ internal class DigitalFace(private val locale: Locale) {
         // top half of the old number, falls toward the viewer and uncovers the new number's top
         // half. Past halfway it is the bottom flap, printed with the new number's bottom half,
         // and it lands over the old one. Angle runs from 0 to 180 degrees.
-        fun drawFlip(oldText: String, oldLeft: Float, newText: String, newLeft: Float, @ColorInt color: Int, angle: Float) {
+        fun drawFlip(
+            oldText: String,
+            oldLeft: Float,
+            newText: String,
+            newLeft: Float,
+            baseline: Float,
+            @ColorInt color: Int,
+            angle: Float,
+        ) {
             val card = RectF()
-            forEachCell(newText, newLeft, y, unit) { card.set(it) }
+            forEachCell(newText, newLeft, baseline, unit) { card.set(it) }
             if (card.isEmpty) return
-            val hinge = y - unit / 2f
+            val hinge = baseline - unit / 2f
             val corner = (design.cells?.corner ?: 0f) * unit
 
             fun face(text: String, textLeft: Float) {
-                drawCells(text, textLeft, y, unit)
-                drawDigits(text, textLeft, y, unit, color, glow)
+                drawCells(text, textLeft, baseline, unit)
+                drawDigits(text, textLeft, baseline, unit, color, glow)
             }
 
             canvas.withClip(card) { drawColor(palette.background) }
@@ -320,9 +349,10 @@ internal class DigitalFace(private val locale: Locale) {
         }
 
         // All cells go down first, so none of them covers the colon.
+        val minutesBaseline = y + minutesDrop
         drawCells(hours, hoursLeft, y, unit)
-        drawCells(minutes, minutesLeft, y, unit)
-        seconds?.let { drawCells(it, sideLeft, y, sideHeight) }
+        drawCells(minutes, minutesLeft, minutesBaseline, unit)
+        seconds?.let { drawCells(it, sideLeft, minutesBaseline, sideHeight) }
 
         drawLayers(0f, null)
         if (sideAmPm != null) {
@@ -339,17 +369,17 @@ internal class DigitalFace(private val locale: Locale) {
             val oldHours = hourText(before)
             val oldMinutes = twoDigits(before.minute)
             if (oldHours != hours) {
-                val oldLeft = rowLeft + (hoursWidth - digits.width(oldHours, 1f)) * unit / 2f
-                drawFlip(oldHours, oldLeft, hours, hoursLeft, palette.color(design.hoursInk), angle)
+                val oldLeft = hoursSlot + (hoursWidth - digits.width(oldHours, 1f)) * unit / 2f
+                drawFlip(oldHours, oldLeft, hours, hoursLeft, y, palette.color(design.hoursInk), angle)
             }
             if (oldMinutes != minutes) {
-                drawFlip(oldMinutes, minutesLeft, minutes, minutesLeft, palette.color(design.minutesInk), angle)
+                drawFlip(oldMinutes, minutesLeft, minutes, minutesLeft, minutesBaseline, palette.color(design.minutesInk), angle)
             }
         }
         drawSplits(hours, hoursLeft, y, unit)
-        drawSplits(minutes, minutesLeft, y, unit)
-        seconds?.let { drawSplits(it, sideLeft, y, sideHeight) }
-        val timeBottom = y
+        drawSplits(minutes, minutesLeft, minutesBaseline, unit)
+        seconds?.let { drawSplits(it, sideLeft, minutesBaseline, sideHeight) }
+        val timeBottom = minutesBaseline
 
         design.rule?.let { rule ->
             val ruleWidth = timeWidth * rule.width * unit
@@ -374,13 +404,16 @@ internal class DigitalFace(private val locale: Locale) {
 
         design.glitch?.let { glitch ->
             panelRect.set(blockLeft, blockTop, blockRight, blockBottom)
-            drawGlitch(canvas, panelRect, timeBaseline - unit, timeBaseline, unit, millis, palette, palette.color(glitch.edgeInk)) {
+            drawGlitch(canvas, panelRect, timeBaseline - unit, timeBaseline + minutesDrop, unit, millis, palette, palette.color(glitch.edgeInk)) {
                     dx, tint ->
                 drawLayers(dx, tint)
             }
         }
         if (design.scanlines) drawScanlines(canvas, blockLeft, blockTop, blockRight, blockBottom, unit, palette.background)
     }
+
+    // A traced date starts with a longer trace to the left of its first letter.
+    private fun traceLead(height: Float, trace: Float): Float = if (trace > 0f) height * TRACE_LEAD else 0f
 
     private fun textWidth(painter: GlyphPainter, text: String, height: Float, trace: Float): Float {
         if (trace <= 0f) return painter.width(text, height)
@@ -591,6 +624,7 @@ internal class DigitalFace(private val locale: Locale) {
         const val NANOS_PER_MILLI = 1_000_000L
         const val SIDE_SIZE = 0.3f
         const val SIDE_GAP = 0.08f
+        const val STACK_GAP = 0.2f
         const val RULE_GAP = 0.2f
         const val SPLIT = 0.03f
         const val MILLIS_PER_MINUTE = 60_000L

@@ -7,6 +7,7 @@ enum class ClockFace {
     fun toggled(): ClockFace = if (this == ANALOG) DIGITAL else ANALOG
 
     companion object {
-        fun fromName(name: String?): ClockFace = entries.firstOrNull { it.name == name } ?: ANALOG
+        fun fromName(name: String?, default: ClockFace = ANALOG): ClockFace =
+            entries.firstOrNull { it.name == name } ?: default
     }
 }

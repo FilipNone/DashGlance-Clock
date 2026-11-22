@@ -17,11 +17,16 @@ app/src/main/                shared by both apps
     ClockDesign.kt           design model: dial, marks, hands, digits, date, colors
     ClockDesigns.kt          catalog; entries in PhoneDesigns, VintageCarDesigns, ModernCarDesigns, RetroSciFiDesigns
     ClockPalette.kt          colors and Ink roles; MaterialYouPalette.kt reads wallpaper colors
-    ClockPreferences.kt      saved face and one design per face, observable from car and phone
+    ClockPreferences.kt      saved face, one design per face, stacked; observable. File "clock" for Clock, "card" for Card
     DateFormats.kt           date styles in the phone's language
     ClockMath.kt             hand angles and tick timing
     SecondTicker.kt          main-thread callback each second, or 25 fps while a design moves (ClockDesign.motion)
-  kotlin/.../ui/Credit.kt    GitHub credit link at the bottom of both phone screens
+  kotlin/.../ui/
+    Credit.kt                GitHub credit link at the bottom of both phone screens
+    ClockView.kt             phone view that wraps ClockRenderer
+    DesignPicker.kt          live design previews for a given list, one sideways row per group
+    DesignSheet.kt           bottom sheet around the picker; pull up for all groups, clock shrinks; hops 1s after opening or a face switch
+    SheetHandle.kt           sheet's drag handle; the line bends into a ^ during the hop
   res/values/icon_paths.xml  icon dial and ticks; each flavor adds its mark
 app/src/fullscreen/          DashGlance Clock
   kotlin/.../car/
@@ -30,22 +35,23 @@ app/src/fullscreen/          DashGlance Clock
     ClockScreen.kt           NavigationTemplate with the analog/digital button; no design picker
     ClockSurfaceRenderer.kt  draws onto the car surface once a second
   kotlin/.../MainActivity.kt phone screen: clock, design sheet, credit
-  kotlin/.../ui/ClockView.kt     phone view that wraps ClockRenderer
-  kotlin/.../ui/DesignPicker.kt  live design previews, one sideways row per group
-  kotlin/.../ui/DesignSheet.kt   bottom sheet around the picker; pull up for all groups, clock shrinks; hops 1s after opening or a face switch
-  kotlin/.../ui/SheetHandle.kt   sheet's drag handle; the line bends into a ^ during the hop
   res/layout-land/activity_main.xml   landscape: clock left, designs right, no sheet
   res/drawable/ic_launcher_*.xml      icon with the Android Auto mark
 app/src/card/                DashGlance Card
   kotlin/.../media/
     ClockMediaService.kt     media app whose card shows the clock next to the map
-    ClockMediaPlayer.kt      silent Media3 player: clock artwork, controls go to PhoneMusic
+    ClockMediaPlayer.kt      silent Media3 player: chosen design as artwork, controls go to PhoneMusic
+    CardDesigns.kt           designs the card can show (no animation, readable once dimmed), their card form, Lagonda redrawn for the card
+    CardArtwork.kt           draws the clock where the card leaves it visible; player and phone preview share it
     PhoneMusic.kt            finds the phone's active music app and controls it
     MediaControlListener.kt  notification listener; needed to read other apps' sessions
     MusicControls.kt         in-app on/off on top of notification access; off unbinds the listener
     SessionListNudge.kt      brief spare session after playback starts, so Android Auto re-reads the session order and gives the card to the clock
-  kotlin/.../MainActivity.kt phone screen: time and date preview, hint, music controls switch, credit
-  res/drawable/switch_*.xml  pill music-controls switch; ease-out animated-selector track, style in themes.xml
+  kotlin/.../MainActivity.kt phone screen: card preview, hint, music controls switch, design sheet with Stacked switch, credit
+  kotlin/.../ui/CardPreview.kt   the card as a 1280 x 720 screen shows it; tap switches face
+  res/layout/design_title_row.xml     design list title with the Stacked switch, in both layouts
+  res/layout-land/activity_main.xml   landscape: preview left, designs right, no sheet
+  res/drawable/switch_*.xml  pill switch; ease-out animated-selector track, style in themes.xml
   res/drawable/ic_launcher_*.xml      icon with music notes
 app/src/test, testCard, testFullscreen   JVM tests for shared code and each app
 scripts/dhu.sh               starts the Desktop Head Unit

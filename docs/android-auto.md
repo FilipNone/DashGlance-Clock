@@ -79,10 +79,11 @@ done
 
 ## Clock next to the map
 
-Tested on Android Auto 18.0 with Waze and Metrolist. The only slot beside another app's map is the media card, so DashGlance Card's `media/ClockMediaService` is a Media3 media app that plays nothing. Its card shows the time as artwork, the date as title and the phone's current song as subtitle. Play/pause and skip go to whichever music app is active, through notification access.
+Tested on Android Auto 18.0 with Waze and Metrolist. The only slot beside another app's map is the media card, so DashGlance Card's `media/ClockMediaService` is a Media3 media app that plays nothing. Its card shows the clock picked on the phone as artwork, the date as title and the phone's current song as subtitle. Play/pause and skip go to whichever music app is active, through notification access.
 
-- At 1280 x 720 the card is tall and narrow and crops the square artwork to its middle 52%, so the digits stay inside that band.
-- Android Auto draws the card. Apps only supply artwork, title, subtitle and buttons. Card artwork is dimmed to about 38% (white digits measure 97/255); the full media screen shows it undimmed.
+- At 1280 x 720 the card is tall and narrow (410 x 700 on the DHU) and crops the square artwork to its middle 52%. The app's icon sits on the top edge and the text covers the bottom 45%, so `CardArtwork` draws the clock in x 24–76%, y 8–54%.
+- Android Auto draws the card. Apps only supply artwork, title, subtitle and buttons. Card artwork is dimmed: black shows as 28/255 and white as 97/255. The full media screen shows it undimmed. docs/designs.md has which designs survive that.
+- The artwork is 640 px square, since analog dials have thin lines. A new design picked on the phone reaches the card at once, through a preferences listener in the service.
 
 ### Why two apps
 
@@ -95,7 +96,7 @@ When both were in one package (0.2), which one you got depended on the head unit
 
 With two packages, tested on the DHU with both release builds installed:
 
-- DHU: two DashGlance tiles, music note and Android Auto mark. The full-screen clock and the clock card show at the same time.
+- DHU: two DashGlance tiles, music notes and Android Auto mark. The full-screen clock and the clock card show at the same time.
 - DHU with a car identity: only DashGlance Card. The sideloaded full-screen app is still denied.
 
 One APK can't install two packages. Splits of an app bundle share one package name too.

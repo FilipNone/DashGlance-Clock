@@ -11,6 +11,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.filipnone.dashglanceclock.clock.ClockDesigns
 import com.filipnone.dashglanceclock.clock.ClockFace
 import com.filipnone.dashglanceclock.clock.ClockPalette
 import com.filipnone.dashglanceclock.clock.ClockPreferences
@@ -87,7 +88,7 @@ class MainActivity : ComponentActivity() {
                     ClockFace.DIGITAL -> R.string.design_title_digital
                 },
             )
-            designs.show(face, clock.design, palette)
+            designs.show(ClockDesigns.forFace(face), clock.design, palette)
         }
         showChosenDesign()
         clock.setOnClickListener { preferences.face = preferences.face.toggled() }

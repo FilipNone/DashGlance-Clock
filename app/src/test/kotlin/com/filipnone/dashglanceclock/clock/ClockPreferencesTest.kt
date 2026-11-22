@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,6 +40,36 @@ class ClockPreferencesTest {
         }
 
         assertSame(ClockDesigns.DashGlanceAnalog, preferences.designFor(ClockFace.ANALOG))
+    }
+
+    @Test
+    fun startsWithTheAnalogFace_unlessToldOtherwise() {
+        assertEquals(ClockFace.ANALOG, preferences.face)
+        assertEquals(ClockFace.DIGITAL, ClockPreferences(context, "other", defaultFace = ClockFace.DIGITAL).face)
+    }
+
+    @Test
+    fun separateFiles_keepSeparateChoices() {
+        val other = ClockPreferences(context, "other")
+        preferences.select(design("tesla"))
+        preferences.stacked = true
+
+        assertSame(ClockDesigns.DashGlanceDigital, other.designFor(ClockFace.DIGITAL))
+        assertFalse(other.stacked)
+    }
+
+    @Test
+    fun listen_reportsChangesUntilStopped() {
+        var changes = 0
+        val stop = preferences.listen { changes++ }
+
+        preferences.stacked = true
+        preferences.face = ClockFace.DIGITAL
+        stop()
+        preferences.stacked = false
+
+        assertEquals(2, changes)
+        assertFalse(preferences.stacked)
     }
 
     private fun design(id: String): ClockDesign = ClockDesigns.all.single { it.id == id }

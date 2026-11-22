@@ -28,17 +28,23 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
+// A view that draws itself only in the part above coveredBottom, the pixels at its bottom that
+// something else covers. ClockView and DashGlance Card's preview are both one.
+interface PartlyCovered {
+    var coveredBottom: Int
+}
+
 // The bottom sheet that holds the design picker. Collapsed, it shows the first group of designs.
 // Pulled up, it shows all of them and the clock above shrinks to stay in view.
-class DesignSheet(
+class DesignSheet<Clock>(
     activity: ComponentActivity,
     private val sheet: View,
     private val header: View,
     private val handle: SheetHandle,
     private val picker: DesignPicker,
     private val content: View,
-    private val clock: ClockView,
-) {
+    private val clock: Clock,
+) where Clock : View, Clock : PartlyCovered {
 
     private val behavior = BottomSheetBehavior.from(sheet)
     private val coordinator = sheet.parent as View

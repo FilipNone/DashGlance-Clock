@@ -11,8 +11,8 @@ android {
         // java.time needs API 26. Going lower means turning on core library desugaring.
         minSdk = 26
         targetSdk = 37
-        versionCode = 4
-        versionName = "0.3.0-beta"
+        versionCode = 5
+        versionName = "0.4.0-beta"
     }
 
     // Two apps from one module. Android Auto drops a package's media service when the same
@@ -69,8 +69,9 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.lifecycle.common)
     implementation(libs.androidx.annotation)
+    // Only for BottomSheetBehavior, which both apps' design sheets use.
+    implementation(libs.material)
     "fullscreenImplementation"(libs.androidx.car.app)
-    "fullscreenImplementation"(libs.material)
     "cardImplementation"(libs.androidx.media3.session)
 
     testImplementation(libs.junit)

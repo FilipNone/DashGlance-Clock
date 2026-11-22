@@ -28,6 +28,7 @@ class ClockMediaService : MediaLibraryService() {
     private lateinit var player: ClockMediaPlayer
     private lateinit var session: MediaLibrarySession
     private lateinit var nudge: SessionListNudge
+    private lateinit var stopWatchingDesign: () -> Unit
 
     private val timeChanged = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -51,6 +52,8 @@ class ClockMediaService : MediaLibraryService() {
             }
         })
         music.refresh()
+        // A design picked on the phone shows up in the car right away.
+        stopWatchingDesign = CardDesigns.preferences(this).listen { player.refresh() }
 
         // ACTION_TIME_TICK arrives at the start of every minute.
         val filter = IntentFilter().apply {
@@ -72,6 +75,7 @@ class ClockMediaService : MediaLibraryService() {
 
     override fun onDestroy() {
         unregisterReceiver(timeChanged)
+        stopWatchingDesign()
         nudge.release()
         music.release()
         session.release()

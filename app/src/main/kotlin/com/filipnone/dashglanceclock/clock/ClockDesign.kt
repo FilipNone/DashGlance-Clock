@@ -223,7 +223,8 @@ data class Cap(val radius: Float, val ink: Ink, val finish: Finish = Finish.FLAT
 data class Knob(val distance: Float, val radius: Float, val ink: Ink)
 
 // Digital sizes and gaps are multiples of the digit height. The defaults draw the DashGlance
-// face.
+// face. Stacked puts the hours above the minutes and leaves out the colon. No design in the
+// catalog sets it; DashGlance Card turns it on for all of them with its Stacked switch.
 data class DigitalDesign(
     override val id: String,
     override val label: String,
@@ -250,6 +251,7 @@ data class DigitalDesign(
     val scanlines: Boolean = false,
     val amPmBefore: Boolean = false,
     val flip: Boolean = false,
+    val stacked: Boolean = false,
 ) : ClockDesign {
     override val face: ClockFace get() = ClockFace.DIGITAL
     override val motion: Motion

@@ -85,20 +85,20 @@ class ClockRendererTest {
     }
 
     @Test
-    fun everyDigitalDesign_staysInsideItsBounds() {
+    fun everyDigitalDesign_staysInsideItsBounds_stackedOrNot() {
         val shapes = listOf(
             Triple(800, 400, RectF(100f, 60f, 700f, 340f)),
             Triple(400, 800, RectF(60f, 100f, 340f, 700f)),
         )
         val times = listOf(at(second = 30), LocalDateTime.of(2026, 11, 18, 8, 59, 7))
-        for (design in ClockDesigns.digital) {
+        for (design in ClockDesigns.digital + ClockDesigns.digital.map { it.copy(stacked = true) }) {
             val palette = design.palette(context, isDarkMode = true)
             for ((width, height, bounds) in shapes) {
                 for (time in times) {
                     for (use24Hour in listOf(true, false)) {
                         val bitmap = render(width, height, bounds, design, palette, time, use24Hour)
 
-                        val case = "${design.id} ${width}x$height $time 24h=$use24Hour"
+                        val case = "${design.id} stacked=${design.stacked} ${width}x$height $time 24h=$use24Hour"
                         val inside = countInk(bitmap, palette.background) { x, y -> bounds.contains(x, y) }
                         // Glows fade out slowly, so their last faint pixels don't count as ink.
                         val outside = countInk(bitmap, palette.background, tolerance = 24) { x, y ->
@@ -110,6 +110,36 @@ class ClockRendererTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun stackedTime_putsTheHoursAboveTheMinutes_andGrowsInATallSpace() {
+        val bounds = RectF(0f, 0f, 300f, 400f)
+        val design = ClockDesigns.DashGlanceDigital.copy(seconds = false, date = null)
+        val inOneRow = inkBox(render(300, 400, bounds, design, ClockPalette.Dark, at(second = 30)))
+        val stacked = inkBox(render(300, 400, bounds, design.copy(stacked = true), ClockPalette.Dark, at(second = 30)))
+
+        // Two rows of digits are taller than they are wide, and each row is larger than the
+        // digits squeezed into one.
+        assertTrue("one row $inOneRow", inOneRow.width() > inOneRow.height())
+        assertTrue("stacked $stacked", stacked.height() > stacked.width())
+        assertTrue(stacked.height() > 2 * inOneRow.height())
+    }
+
+    @Test
+    fun stackedFlipClock_turnsItsCardsInBothRows() {
+        val design = ClockDesigns.digital.single { it.id == "flip_clock" }.copy(stacked = true)
+        val palette = design.palette(context, isDarkMode = true)
+        val bounds = RectF(60f, 100f, 340f, 700f)
+        val minute = LocalDateTime.of(2026, 11, 20, 10, 0, 0)
+
+        val turning = render(400, 800, bounds, design, palette, minute.plusNanos(250_000_000L), use24Hour = false)
+        val after = render(400, 800, bounds, design, palette, minute.plusSeconds(30), use24Hour = false)
+
+        val half = 400
+        assertFalse("hours row", sameRows(turning, after, 0, half))
+        assertFalse("minutes row", sameRows(turning, after, half, 800))
+        assertEquals(0, countInk(turning, palette.background, tolerance = 24) { x, y -> !bounds.contains(x, y) })
     }
 
     @Test
@@ -224,6 +254,34 @@ class ClockRendererTest {
         val x = DIAL_CX + DIAL_RADIUS * distance * sin(angle)
         val y = DIAL_CY - DIAL_RADIUS * distance * cos(angle)
         return bitmap.getPixel(x.roundToInt(), y.roundToInt())
+    }
+
+    // The smallest box around every pixel that isn't the dark background.
+    private fun inkBox(bitmap: Bitmap): RectF {
+        var left = bitmap.width
+        var top = bitmap.height
+        var right = 0
+        var bottom = 0
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                if (bitmap.getPixel(x, y) != ClockPalette.Dark.background) {
+                    left = minOf(left, x)
+                    top = minOf(top, y)
+                    right = maxOf(right, x + 1)
+                    bottom = maxOf(bottom, y + 1)
+                }
+            }
+        }
+        return RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+    }
+
+    private fun sameRows(first: Bitmap, second: Bitmap, from: Int, to: Int): Boolean {
+        val height = to - from
+        val a = IntArray(first.width * height)
+        val b = IntArray(second.width * height)
+        first.getPixels(a, 0, first.width, 0, from, first.width, height)
+        second.getPixels(b, 0, second.width, 0, from, second.width, height)
+        return a.contentEquals(b)
     }
 
     // Counts the pixels that differ from the background by more than the tolerance, in any

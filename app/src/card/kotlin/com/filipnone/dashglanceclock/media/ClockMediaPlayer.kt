@@ -3,10 +3,6 @@ package com.filipnone.dashglanceclock.media
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
 import android.os.Looper
 import android.text.format.DateFormat
 import androidx.annotation.OptIn
@@ -17,18 +13,17 @@ import androidx.media3.common.Player
 import androidx.media3.common.SimpleBasePlayer
 import androidx.media3.common.util.UnstableApi
 import com.filipnone.dashglanceclock.R
-import com.filipnone.dashglanceclock.clock.ClockPalette
+import com.filipnone.dashglanceclock.clock.ClockDesign
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.min
 
 // A player that plays nothing. Its only media item is the current time, so Android Auto's
-// media card shows a clock. Play/pause and skip go to the music player that's active on
-// the phone, through MusicRemote.
+// media card shows a clock in the design picked on the phone. Play/pause and skip go to the
+// music player that's active on the phone, through MusicRemote.
 @OptIn(UnstableApi::class)
 class ClockMediaPlayer(
     private val context: Context,
@@ -36,21 +31,13 @@ class ClockMediaPlayer(
     private val now: () -> LocalDateTime = LocalDateTime::now,
 ) : SimpleBasePlayer(Looper.getMainLooper()) {
 
-    private val dateFormatter = DateTimeFormatter.ofPattern(DATE_PATTERN)
-    private val palette = ClockPalette.Dark
-    // Android Auto dims card artwork to about 40% under its own overlay, so the digits are
-    // pure white and a heavier weight than the car screen's clock.
-    private val digitsPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        typeface = Typeface.create("sans-serif", Typeface.NORMAL)
-        fontFeatureSettings = "tnum"
-        textAlign = Paint.Align.CENTER
-        color = Color.WHITE
-    }
-    private val digitBounds = Rect()
-    private var artworkKey: String? = null
+    private val preferences = CardDesigns.preferences(context)
+    private val designs = CardDesigns(context)
+    private val cardArtwork = CardArtwork()
+    private var artworkKey: ArtworkKey? = null
     private var artwork = ByteArray(0)
 
-    // Call when the minute or the phone's music changes.
+    // Call when the minute, the chosen design or the phone's music changes.
     fun refresh() = invalidateState()
 
     override fun getState(): State {
@@ -58,9 +45,12 @@ class ClockMediaPlayer(
         val playing = music.nowPlaying
 
         val metadata = MediaMetadata.Builder()
-            .setTitle(time.format(dateFormatter).replaceFirstChar { it.titlecase() })
+            .setTitle(title(time))
             .setArtist(subtitle(playing))
-            .setArtworkData(artworkFor(time.format(timeFormatter())), MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+            .setArtworkData(
+                artworkFor(ArtworkKey(time, designs.chosen(preferences), DateFormat.is24HourFormat(context))),
+                MediaMetadata.PICTURE_TYPE_FRONT_COVER,
+            )
             .setIsBrowsable(false)
             .setIsPlayable(true)
             .build()
@@ -104,9 +94,6 @@ class ClockMediaPlayer(
 
     override fun handleRelease(): ListenableFuture<*> = Futures.immediateVoidFuture()
 
-    private fun timeFormatter(): DateTimeFormatter =
-        DateTimeFormatter.ofPattern(if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm")
-
     private fun subtitle(playing: NowPlaying?): String = when {
         !music.isAllowed -> context.getString(R.string.media_needs_access)
         playing == null -> ""
@@ -114,42 +101,34 @@ class ClockMediaPlayer(
     }
 
     // Android Auto stretches the artwork over the whole card and puts the title and buttons
-    // on its lower half, so the digits go in the upper middle of the square.
-    private fun artworkFor(time: String): ByteArray {
-        if (time == artworkKey) return artwork
+    // on its lower half. The card is always dark, so designs use their dark colors.
+    private fun artworkFor(key: ArtworkKey): ByteArray {
+        if (key == artworkKey) return artwork
         val bitmap = createBitmap(ARTWORK_SIZE, ARTWORK_SIZE)
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(palette.background)
-
-        val maxWidth = ARTWORK_SIZE * DIGITS_MAX_WIDTH
-        val maxHeight = ARTWORK_SIZE * DIGITS_MAX_HEIGHT
-        digitsPaint.textSize = REFERENCE_TEXT_SIZE
-        digitsPaint.getTextBounds(time, 0, time.length, digitBounds)
-        digitsPaint.textSize = REFERENCE_TEXT_SIZE *
-            min(maxWidth / digitsPaint.measureText(time), maxHeight / digitBounds.height())
-        digitsPaint.getTextBounds(time, 0, time.length, digitBounds)
-        canvas.drawText(time, ARTWORK_SIZE / 2f, ARTWORK_SIZE * DIGITS_CENTER_Y - digitBounds.exactCenterY(), digitsPaint)
+        val palette = key.design.palette(context, isDarkMode = true)
+        cardArtwork.draw(Canvas(bitmap), 0f, 0f, ARTWORK_SIZE.toFloat(), key.time, key.design, palette, key.use24Hour)
 
         artwork = ByteArrayOutputStream().use { out ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             out.toByteArray()
         }
         bitmap.recycle()
-        artworkKey = time
+        artworkKey = key
         return artwork
     }
+
+    private data class ArtworkKey(val time: LocalDateTime, val design: ClockDesign, val use24Hour: Boolean)
 
     companion object {
         const val DATE_PATTERN = "EEEE d MMMM"
         private const val CLOCK_ITEM_ID = "clock"
-        private const val ARTWORK_SIZE = 320
-        private const val REFERENCE_TEXT_SIZE = 100f
 
-        // Fractions of the artwork. The card crops the square to its own shape, and on a
-        // 1280 x 720 screen only the middle 52% of the width stays visible. The card's text
-        // covers the bottom 45%.
-        private const val DIGITS_CENTER_Y = 0.3f
-        private const val DIGITS_MAX_WIDTH = 0.46f
-        private const val DIGITS_MAX_HEIGHT = 0.26f
+        // Analog dials have thin lines, so the picture is 640 px. Android's media session
+        // scales down any artwork wider than 320 dp before other apps get it.
+        private const val ARTWORK_SIZE = 640
+
+        // The card's title, such as "Sunday 22 November", in the phone's language.
+        fun title(time: LocalDateTime): String =
+            time.format(DateTimeFormatter.ofPattern(DATE_PATTERN)).replaceFirstChar { it.titlecase() }
     }
 }

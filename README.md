@@ -48,7 +48,7 @@ DashGlance comes as two apps. Install the one you need, or both:
 
 | App | Icon | What it does |
 |---|---|---|
-| DashGlance Card | clock dial with music notes | The time and date in the music card next to the map, with the song playing on your phone. Play/pause, next and previous go to whichever music app is playing. |
+| DashGlance Card | clock dial with music notes | The time and date in the music card next to the map, with the song playing on your phone. Play/pause, next and previous go to whichever music app is playing. Pick from 30 designs on your phone; digital ones can be stacked. |
 | DashGlance Clock | clock dial with the Android Auto mark | Full-screen analog and digital faces with seconds, in 40 designs you pick on your phone: Modern clocks, Vintage clocks, Retro and Sci-Fi ([docs/designs.md](docs/designs.md)). |
 
 Both use 12- or 24-hour time from your phone settings and the date in your language. Neither has internet access, ads or tracking.
@@ -66,13 +66,14 @@ DashGlance Card works in a car. DashGlance Clock only shows up on test head unit
 2. Android Auto hides apps that don't come from Google Play, so turn on its developer settings: open Android Auto's settings, tap Version 10 times, and confirm.
 3. In the ⋮ menu, open Developer settings and turn on Unknown sources.
 4. Open DashGlance Card on your phone and turn on Allow music controls. The first time, Android asks you to give it notification access. The app uses it to see and control your music app, and ignores your notifications. Turning the switch off later stops the app from using the access; to remove the access itself, turn it off in Android's notification access settings.
-5. Connect to your car. DashGlance Card is in the Android Auto app list, with music notes on its icon. With music controls on, the card next to the map shows the clock while your music plays and keeps it when you pause. Without them, your music app takes the card whenever it plays.
+5. Pick a clock: tap the preview for analog or digital, then choose a design below it.
+6. Connect to your car. DashGlance Card is in the Android Auto app list, with music notes on its icon. With music controls on, the card next to the map shows the clock while your music plays and keeps it when you pause. Without them, your music app takes the card whenever it plays.
 
 If DashGlance Card is missing from the car's app list, check step 3 first: without Unknown sources, Android Auto hides it.
 
 While no car is connected, Android Auto's "Customize launcher" screen on the phone won't list the apps. That's expected.
 
-Updating from 0.2: install DashGlance Card over the old app. It replaces it and keeps your music controls setting. DashGlance Clock is a separate install and starts with the default designs.
+Updating from 0.2: install DashGlance Card over the old app. It replaces it and keeps your music controls setting. Your old designs don't carry over to the card. DashGlance Clock is a separate install and starts with the default designs.
 
 ## Contributing
 
